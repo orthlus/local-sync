@@ -14,34 +14,6 @@ import java.util.stream.Collectors;
 
 @Component
 public class ServerMapper {
-	@Value("${tabby.config.rsa_file_prefix}")
-	private String tabbyConfigRsaFilePrefix;
-
-	public SshServer map(Server server) {
-		return new SshServer(
-				server.getIp(),
-				getKeyFullPath(server.getSshKey()),
-				server.getPort(),
-				server.getName()
-		);
-	}
-
-	public SshServer map(TabbyServer tabbyServer) {
-		return new SshServer(
-				tabbyServer.host(),
-				getKeyFullPath(tabbyServer.keyPath()),
-				tabbyServer.port(),
-				tabbyServer.name()
-		);
-	}
-
-	private String getKeyFullPath(String relativeKeyPath) {
-		return tabbyConfigRsaFilePrefix
-					   .replace("file://", "")
-					   .replaceAll("\\\\", "/")
-			   + relativeKeyPath;
-	}
-
 	public Map<String, DirServer> toMapServers(List<DirServer> dirServers) {
 		return dirServers.stream().collect(Collectors.toMap(DirServer::name, Function.identity()));
 	}
