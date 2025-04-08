@@ -1,5 +1,6 @@
 package art.aelaort.k8s;
 
+import art.aelaort.k8s.dto.IngressRouteSpec;
 import art.aelaort.models.servers.K8sApp;
 import art.aelaort.models.servers.K8sService;
 import art.aelaort.utils.Utils;
@@ -18,6 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static art.aelaort.k8s.K8sUtils.unwrap;
 
@@ -25,6 +27,7 @@ import static art.aelaort.k8s.K8sUtils.unwrap;
 @RequiredArgsConstructor
 public class K8sYamlParser {
 	private final Utils utils;
+	private final IngressRouteParser ingressRouteParser;
 
 	public List<K8sService> parseK8sYmlFileForServices(Path ymlFile) {
 		List<HasMetadata> k8sObjects = parse(ymlFile);
@@ -40,7 +43,34 @@ public class K8sYamlParser {
 			result.add(obj);
 		}
 
-		return result;
+		return enrichWithRoutes(result, k8sObjects);
+	}
+
+	private List<K8sService> enrichWithRoutes(List<K8sService> result, List<HasMetadata> k8sObjects) {
+		List<K8sService> newResult = new ArrayList<>(k8sObjects.size());
+
+		Map<String, IngressRouteSpec> mapRoutesByServiceName = ingressRouteParser.getMapRoutesByServiceName(k8sObjects);
+
+		for (K8sService k8sService : result) {
+			IngressRouteSpec ingressRouteSpec = mapRoutesByServiceName.get(k8sService.getName());
+			if (ingressRouteSpec != null) {
+				String routeMatch = ingressRouteSpec.getRoutes().get(0).getMatch();
+				String routeMatch1 = cleanRouteMatchIfPossible(routeMatch);
+				K8sService e = k8sService.withRoute(routeMatch1);
+				newResult.add(e);
+			} else {
+				newResult.add(k8sService);
+			}
+		}
+
+		return newResult;
+	}
+
+	private String cleanRouteMatchIfPossible(String routeMatch) {
+		if (routeMatch.matches("Host\\(`[a-z.]+`\\)")) {
+			return routeMatch.substring(6, routeMatch.length() - 2);
+		}
+		return routeMatch;
 	}
 
 	private K8sService convert(Service service) {
