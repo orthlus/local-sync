@@ -67,8 +67,13 @@ public class K8sYamlParser {
 	}
 
 	private String cleanRouteMatchIfPossible(String routeMatch) {
-		if (routeMatch.matches("Host\\(`[a-z.]+`\\)")) {
+		if (routeMatch.matches("Host\\(`[\\w.-]+`\\)")) {
 			return routeMatch.substring(6, routeMatch.length() - 2);
+		} else if (routeMatch.matches("Host\\(`[\\w.-]+`\\) && PathPrefix\\(`[/\\w.-]+`\\)")) {
+			String[] split = routeMatch.split(" && ");
+			String host = split[0];
+			String path = split[1];
+			return host.substring(6, host.length() - 2) + path.substring(12, path.length() - 2);
 		}
 		return routeMatch;
 	}
