@@ -96,7 +96,7 @@ public class K8sYamlParser {
 			return;
 		}
 
-		if (ports.size() > 1) {
+		if (ports.size() > 1 && !allPortsNumberSame(ports)) {
 			builder.hasAnotherPorts(true);
 		}
 
@@ -111,6 +111,31 @@ public class K8sYamlParser {
 		if (port.getNodePort() != null) {
 			builder.nodePort(port.getNodePort());
 		}
+	}
+
+	private boolean allPortsNumberSame(List<ServicePort> ports) {
+		if (ports.size() == 1) {
+			return true;
+		}
+
+		if (ports.stream().allMatch(sp -> sp.getNodePort() != null)) {
+			int port = ports.get(0).getNodePort();
+			for (ServicePort servicePort : ports) {
+				if (servicePort.getNodePort() != port) {
+					return false;
+				}
+			}
+			return true;
+		} else if (ports.stream().allMatch(sp -> sp.getNodePort() == null)) {
+			int port = ports.get(0).getPort();
+			for (ServicePort servicePort : ports) {
+				if (servicePort.getPort() != port) {
+					return false;
+				}
+			}
+			return true;
+		}
+		return false;
 	}
 
 	public List<K8sApp> parseK8sYmlFileForApps(Path ymlFile) {
