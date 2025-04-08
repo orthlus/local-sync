@@ -1,9 +1,10 @@
 package art.aelaort.k8s;
 
 import art.aelaort.k8s.dto.IngressRouteSpec;
+import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import io.fabric8.kubernetes.api.model.GenericKubernetesResource;
 import io.fabric8.kubernetes.api.model.HasMetadata;
-import io.fabric8.kubernetes.client.utils.Serialization;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -13,7 +14,10 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Component
+@RequiredArgsConstructor
 public class IngressRouteParser {
+	private final YAMLMapper yamlMapper;
+
 	public Map<String, IngressRouteSpec> getMapRoutesByServiceName(List<HasMetadata> k8sObjects) {
 		return getIngressRoutes(k8sObjects)
 				.stream()
@@ -39,8 +43,11 @@ public class IngressRouteParser {
 	}
 
 	private Optional<IngressRouteSpec> parseIngressRoute(GenericKubernetesResource ingressRoute) {
-		Object spec1 = ingressRoute.getAdditionalProperties().get("spec");
-		return Optional.ofNullable(spec1)
-				.map(spec -> Serialization.unmarshal((String) spec, IngressRouteSpec.class));
+		Object spec = ingressRoute.getAdditionalProperties().get("spec");
+		if (spec == null) {
+			return Optional.empty();
+		}
+		IngressRouteSpec ingressRouteSpec = yamlMapper.convertValue(spec, IngressRouteSpec.class);
+		return Optional.of(ingressRouteSpec);
 	}
 }
