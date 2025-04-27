@@ -16,8 +16,7 @@ public class ExternalUtilities {
 	public void dirSync() {
 		Response response = systemProcess.callProcessInheritFilteredStdout(
 				stdout -> !stdout.contains("/.git/")
-						  && !stdout.contains("Completed ")
-						  && !stdout.contains(".idea\\workspace.xml"), "workdir-sync.bat");
+						  && !stdout.contains("Completed "), "workdir-sync.bat");
 
 		if (response.exitCode() != 0) {
 			throw new RuntimeException("dir sync error \n%s\n%s".formatted(response.stderr(), response.stdout()));
@@ -25,7 +24,7 @@ public class ExternalUtilities {
 
 		int projectsCount = StringUtils.countMatches(response.stdout(), ".idea\\workspace.xml");
 		if (projectsCount > 0) {
-			log("also synced .idea projects: %d projects\n", projectsCount);
+			log("synced .idea projects: %d projects\n", projectsCount);
 		}
 
 		int gitRows = StringUtils.countMatches(response.stdout(), "/.git/");
