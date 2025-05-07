@@ -1,5 +1,6 @@
 package art.aelaort.servers.providers;
 
+import art.aelaort.CryptoJSImpl;
 import art.aelaort.mappers.TabbyMapper;
 import art.aelaort.models.servers.TabbyServer;
 import art.aelaort.models.servers.yaml.TabbyFile;
@@ -8,9 +9,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -24,7 +23,6 @@ public class TabbyServerProvider {
 	private final TabbyS3 tabbyS3;
 	private final YAMLMapper yamlMapper;
 	private final TabbyMapper tabbyMapper;
-	private final RestTemplate tabbyDecoder;
 	@Value("${tabby.config.path}")
 	private Path tabbyConfigPath;
 	@Value("${tabby.decode.password}")
@@ -64,7 +62,6 @@ public class TabbyServerProvider {
 	}
 
 	private String decode(String data) {
-		String url = "/decrypt?password={decodePassword}";
-		return tabbyDecoder.postForObject(url, new HttpEntity<>(data), String.class, decodePassword);
+		return CryptoJSImpl.decrypt(data, decodePassword);
 	}
 }
