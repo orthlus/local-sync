@@ -6,6 +6,10 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
+
 import static art.aelaort.utils.Utils.log;
 
 @Component
@@ -22,14 +26,41 @@ public class ExternalUtilities {
 			throw new RuntimeException("dir sync error \n%s\n%s".formatted(response.stderr(), response.stdout()));
 		}
 
-		int projectsCount = StringUtils.countMatches(response.stdout(), ".idea\\workspace.xml");
+		List<String> projects = getProjects(response.stdout());
+		int projectsCount = projects.size();
 		if (projectsCount > 0) {
-			log("synced .idea projects: %d projects\n", projectsCount);
+			log("synced %d .idea projects:\n", projectsCount);
+			projects.forEach(Utils::log);
+			log();
 		}
 
 		int gitRows = StringUtils.countMatches(response.stdout(), "/.git/");
 		if (gitRows > 0) {
 			log("also synced .git: %d paths\n", gitRows);
 		}
+	}
+
+	private List<String> getProjects(String stdout) {
+		String prefix = "upload: ";
+		String file = ".idea\\workspace.xml";
+		String fileRx = file.replace("\\", "\\\\");
+
+		String[] lines = stdout
+				.replace(prefix, "\n" + prefix)
+				.split("\\n");
+		List<String> projectsLines = Stream.of(lines)
+				.filter(line -> line.startsWith(prefix))
+				.filter(line -> line.contains(file))
+				.toList();
+		List<String> projects = new ArrayList<>(projectsLines.size());
+		for (String line : projectsLines) {
+			String[] split = line.split(fileRx);
+			String name = split[0]
+					.replaceAll("/$", "")
+					.replaceAll("\\\\$", "")
+					.replace(prefix, "- ");
+			projects.add(name);
+		}
+		return projects;
 	}
 }
