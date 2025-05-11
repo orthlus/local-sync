@@ -42,8 +42,8 @@ public class IngressRouteParser {
 			   && "traefik.containo.us/v1alpha1".equals(resource.getApiVersion());
 	}
 
-	private Optional<IngressRouteSpec> parseIngressRoute(GenericKubernetesResource ingressRoute) {
-		Object spec = ingressRoute.getAdditionalProperties().get("spec");
+	private Optional<IngressRouteSpec> parseIngressRoute(GenericKubernetesResource genericIngressRoute) {
+		Object spec = genericIngressRoute.getAdditionalProperties().get("spec");
 		if (spec == null) {
 			return Optional.empty();
 		}
