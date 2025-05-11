@@ -1,6 +1,5 @@
 package art.aelaort.utils;
 
-import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -8,14 +7,14 @@ import java.util.Arrays;
 
 @Component
 public class Utils {
-	@Value("${servers.management.docker.image.pattern}")
-	private String dockerImagePattern;
-	private String[] dockerImagePatternSplit;
-
-	@PostConstruct
-	private void init() {
-		dockerImagePatternSplit = dockerImagePattern.split("%%");
-	}
+	@Value("${servers.management.docker-reg-name-1}")
+	private String dockerImagePattern1;
+	@Value("${servers.management.docker-reg-name-2}")
+	private String dockerImagePattern2;
+	@Value("${servers.management.docker-reg-name-1.replacement}")
+	private String dockerImagePattern1Replacement;
+	@Value("${servers.management.docker-reg-name-2.replacement}")
+	private String dockerImagePattern2Replacement;
 
 	public static void log(String format, Object... args) {
 		System.out.printf(format, args);
@@ -39,7 +38,8 @@ public class Utils {
 
 	public String dockerImageClean(String dockerImage) {
 		return dockerImage
-				.replace(dockerImagePatternSplit[0], "")
-				.replace(dockerImagePatternSplit[1], "");
+				.replace(":latest", "")
+				.replace(dockerImagePattern1, dockerImagePattern1Replacement)
+				.replace(dockerImagePattern2, dockerImagePattern2Replacement);
 	}
 }
