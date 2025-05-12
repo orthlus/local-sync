@@ -1,6 +1,7 @@
 package art.aelaort.k8s;
 
 import art.aelaort.models.servers.k8s.K8sIngressRoute;
+import art.aelaort.models.servers.k8s.input.IngressRouteSpec;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import io.fabric8.kubernetes.api.model.GenericKubernetesResource;
 import io.fabric8.kubernetes.api.model.HasMetadata;
@@ -22,7 +23,7 @@ class IngressRouteParser {
 		return getIngressRoutes(k8sObjects)
 				.stream()
 				.collect(Collectors.toMap(
-						irs -> irs.getRoutes().get(0).getServices().get(0).getName(),
+						K8sIngressRoute::getServiceName,
 						Function.identity()
 				));
 	}
@@ -50,13 +51,8 @@ class IngressRouteParser {
 		if (spec == null) {
 			return Optional.empty();
 		}
-		K8sIngressRoute ingressRoute0 = yamlMapper.convertValue(spec, K8sIngressRoute.class);
-		K8sIngressRoute ingressRoute = ingressRoute0.toBuilder()
-				.name(genericIngressRoute.getMetadata().getName())
-				.namespace(genericIngressRoute.getMetadata().getNamespace())
-				.hasTls(ingressRoute0.getTls() != null)
-				.tls(null)
-				.build();
+		IngressRouteSpec ingressRouteSpec = yamlMapper.convertValue(spec, IngressRouteSpec.class);
+		K8sIngressRoute ingressRoute = K8sIngressRouteMapper.map(ingressRouteSpec, genericIngressRoute);
 		return Optional.of(ingressRoute);
 	}
 }

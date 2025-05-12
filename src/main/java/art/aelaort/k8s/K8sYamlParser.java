@@ -63,9 +63,8 @@ public class K8sYamlParser {
 		for (K8sService k8sService : result) {
 			K8sIngressRoute ingressRouteSpec = mapRoutesByServiceName.get(k8sService.getName());
 			if (ingressRouteSpec != null) {
-				String routeMatch = ingressRouteSpec.getRoutes().get(0).getMatch();
-				String routeMatch1 = cleanRouteMatchIfPossible(routeMatch);
-				K8sService e = k8sService.withRoute(routeMatch1);
+				String routeMatch = cleanRouteMatchIfPossible(ingressRouteSpec.getMatch());
+				K8sService e = k8sService.withRoute(routeMatch);
 				newResult.add(e);
 			} else {
 				newResult.add(k8sService);
