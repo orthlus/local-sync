@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
-public class IngressRouteParser {
+class IngressRouteParser {
 	private final YAMLMapper yamlMapper;
 
 	public Map<String, K8sIngressRoute> getMapRoutesByServiceName(List<HasMetadata> k8sObjects) {
@@ -38,8 +38,11 @@ public class IngressRouteParser {
 	}
 
 	private boolean isIngressRoute(GenericKubernetesResource resource) {
-		return "IngressRoute".equals(resource.getKind())
-			   && "traefik.containo.us/v1alpha1".equals(resource.getApiVersion());
+		if ("IngressRoute".equals(resource.getKind())) {
+			String api = resource.getApiVersion();
+			return "traefik.containo.us/v1alpha1".equals(api) || "traefik.io/v1alpha1".equals(api);
+		}
+		return false;
 	}
 
 	private Optional<K8sIngressRoute> parseIngressRoute(GenericKubernetesResource genericIngressRoute) {
