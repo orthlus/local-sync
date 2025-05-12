@@ -1,7 +1,7 @@
 package art.aelaort.k8s;
 
-import art.aelaort.models.servers.K8sApp;
-import art.aelaort.models.servers.K8sCluster;
+import art.aelaort.models.servers.k8s.K8sApp;
+import art.aelaort.models.servers.k8s.K8sCluster;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

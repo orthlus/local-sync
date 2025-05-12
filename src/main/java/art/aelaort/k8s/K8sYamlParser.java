@@ -1,9 +1,9 @@
 package art.aelaort.k8s;
 
-import art.aelaort.k8s.dto.IngressRouteSpec;
-import art.aelaort.models.servers.K8sApp;
-import art.aelaort.models.servers.K8sHelmChart;
-import art.aelaort.models.servers.K8sService;
+import art.aelaort.models.servers.k8s.K8sApp;
+import art.aelaort.models.servers.k8s.K8sHelmChart;
+import art.aelaort.models.servers.k8s.K8sIngressRoute;
+import art.aelaort.models.servers.k8s.K8sService;
 import art.aelaort.utils.Utils;
 import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.api.model.apps.DaemonSet;
@@ -54,10 +54,10 @@ public class K8sYamlParser {
 	private List<K8sService> enrichWithRoutes(List<K8sService> result, List<HasMetadata> k8sObjects) {
 		List<K8sService> newResult = new ArrayList<>(k8sObjects.size());
 
-		Map<String, IngressRouteSpec> mapRoutesByServiceName = ingressRouteParser.getMapRoutesByServiceName(k8sObjects);
+		Map<String, K8sIngressRoute> mapRoutesByServiceName = ingressRouteParser.getMapRoutesByServiceName(k8sObjects);
 
 		for (K8sService k8sService : result) {
-			IngressRouteSpec ingressRouteSpec = mapRoutesByServiceName.get(k8sService.getName());
+			K8sIngressRoute ingressRouteSpec = mapRoutesByServiceName.get(k8sService.getName());
 			if (ingressRouteSpec != null) {
 				String routeMatch = ingressRouteSpec.getRoutes().get(0).getMatch();
 				String routeMatch1 = cleanRouteMatchIfPossible(routeMatch);

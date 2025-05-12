@@ -1,6 +1,6 @@
 package art.aelaort.k8s;
 
-import art.aelaort.models.servers.K8sHelmChart;
+import art.aelaort.models.servers.k8s.K8sHelmChart;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import io.fabric8.kubernetes.api.model.GenericKubernetesResource;
 import io.fabric8.kubernetes.api.model.HasMetadata;

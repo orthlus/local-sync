@@ -1,6 +1,6 @@
 package art.aelaort.k8s;
 
-import art.aelaort.k8s.dto.IngressRouteSpec;
+import art.aelaort.models.servers.k8s.K8sIngressRoute;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import io.fabric8.kubernetes.api.model.GenericKubernetesResource;
 import io.fabric8.kubernetes.api.model.HasMetadata;
@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 public class IngressRouteParser {
 	private final YAMLMapper yamlMapper;
 
-	public Map<String, IngressRouteSpec> getMapRoutesByServiceName(List<HasMetadata> k8sObjects) {
+	public Map<String, K8sIngressRoute> getMapRoutesByServiceName(List<HasMetadata> k8sObjects) {
 		return getIngressRoutes(k8sObjects)
 				.stream()
 				.collect(Collectors.toMap(
@@ -27,7 +27,7 @@ public class IngressRouteParser {
 				));
 	}
 
-	private List<IngressRouteSpec> getIngressRoutes(List<HasMetadata> k8sObjects) {
+	private List<K8sIngressRoute> getIngressRoutes(List<HasMetadata> k8sObjects) {
 		return k8sObjects.stream()
 				.filter(GenericKubernetesResource.class::isInstance)
 				.map(GenericKubernetesResource.class::cast)
@@ -42,12 +42,12 @@ public class IngressRouteParser {
 			   && "traefik.containo.us/v1alpha1".equals(resource.getApiVersion());
 	}
 
-	private Optional<IngressRouteSpec> parseIngressRoute(GenericKubernetesResource genericIngressRoute) {
+	private Optional<K8sIngressRoute> parseIngressRoute(GenericKubernetesResource genericIngressRoute) {
 		Object spec = genericIngressRoute.getAdditionalProperties().get("spec");
 		if (spec == null) {
 			return Optional.empty();
 		}
-		IngressRouteSpec ingressRouteSpec = yamlMapper.convertValue(spec, IngressRouteSpec.class);
+		K8sIngressRoute ingressRouteSpec = yamlMapper.convertValue(spec, K8sIngressRoute.class);
 		return Optional.of(ingressRouteSpec);
 	}
 }

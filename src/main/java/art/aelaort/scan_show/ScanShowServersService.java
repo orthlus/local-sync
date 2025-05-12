@@ -2,8 +2,8 @@ package art.aelaort.scan_show;
 
 import art.aelaort.ServersManagementService;
 import art.aelaort.k8s.K8sClusterProvider;
-import art.aelaort.models.servers.K8sCluster;
 import art.aelaort.models.servers.Server;
+import art.aelaort.models.servers.k8s.K8sCluster;
 import art.aelaort.servers.providers.ServerProvider;
 import art.aelaort.utils.ExternalUtilities;
 import lombok.RequiredArgsConstructor;
