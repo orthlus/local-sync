@@ -2,6 +2,7 @@ package art.aelaort.k8s;
 
 import art.aelaort.k8s.dto.IngressRouteSpec;
 import art.aelaort.models.servers.K8sApp;
+import art.aelaort.models.servers.K8sHelmChart;
 import art.aelaort.models.servers.K8sService;
 import art.aelaort.utils.Utils;
 import io.fabric8.kubernetes.api.model.*;
@@ -28,6 +29,12 @@ import static art.aelaort.k8s.K8sUtils.unwrap;
 public class K8sYamlParser {
 	private final Utils utils;
 	private final IngressRouteParser ingressRouteParser;
+	private final HelmChartParser helmChartParser;
+
+	public List<K8sHelmChart> parseK8sYmlFileForHelmCharts(Path ymlFile) {
+		List<HasMetadata> k8sObjects = parse(ymlFile);
+		return helmChartParser.getChartsList(k8sObjects);
+	}
 
 	public List<K8sService> parseK8sYmlFileForServices(Path ymlFile) {
 		List<HasMetadata> k8sObjects = parse(ymlFile);

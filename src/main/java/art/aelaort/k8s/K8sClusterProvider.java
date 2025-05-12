@@ -51,6 +51,12 @@ public class K8sClusterProvider {
 							.map(k8sYamlParser::parseK8sYmlFileForServices)
 							.flatMap(Collection::stream)
 							.toList())
+					.helmCharts(getYamlFiles(dir)
+							.stream()
+							.map(k8sYamlParser::parseK8sYmlFileForHelmCharts)
+							.flatMap(Collection::stream)
+							.toList()
+					)
 					.nodes(readNodes(clustersDir))
 					.build();
 
