@@ -31,16 +31,14 @@ public class K8sYamlParser {
 	private final IngressRouteParser ingressRouteParser;
 	private final HelmChartParser helmChartParser;
 
-	public List<K8sHelmChart> parseK8sYmlFileForHelmCharts(Path ymlFile) {
-		List<HasMetadata> k8sObjects = parse(ymlFile);
-		return helmChartParser.getChartsList(k8sObjects);
+	public List<K8sHelmChart> parseK8sYmlFileForHelmCharts(List<HasMetadata> hasMetadataList) {
+		return helmChartParser.getChartsList(hasMetadataList);
 	}
 
-	public List<K8sService> parseK8sYmlFileForServices(Path ymlFile) {
-		List<HasMetadata> k8sObjects = parse(ymlFile);
-		List<K8sService> result = new ArrayList<>(k8sObjects.size());
+	public List<K8sService> parseK8sYmlFileForServices(List<HasMetadata> hasMetadataList) {
+		List<K8sService> result = new ArrayList<>(hasMetadataList.size());
 
-		for (HasMetadata k8sObject : k8sObjects) {
+		for (HasMetadata k8sObject : hasMetadataList) {
 			K8sService obj;
 			if (k8sObject instanceof Service o) {
 				obj = convert(o);
@@ -50,7 +48,7 @@ public class K8sYamlParser {
 			result.add(obj);
 		}
 
-		return enrichWithRoutes(result, k8sObjects);
+		return enrichWithRoutes(result, hasMetadataList);
 	}
 
 	private List<K8sService> enrichWithRoutes(List<K8sService> result, List<HasMetadata> k8sObjects) {
@@ -149,11 +147,10 @@ public class K8sYamlParser {
 		return false;
 	}
 
-	public List<K8sApp> parseK8sYmlFileForApps(Path ymlFile) {
-		List<HasMetadata> k8sObjects = parse(ymlFile);
-		List<K8sApp> result = new ArrayList<>(k8sObjects.size());
+	public List<K8sApp> parseK8sYmlFileForApps(List<HasMetadata> hasMetadataList) {
+		List<K8sApp> result = new ArrayList<>(hasMetadataList.size());
 
-		for (HasMetadata k8sObject : k8sObjects) {
+		for (HasMetadata k8sObject : hasMetadataList) {
 			K8sApp obj;
 			if (k8sObject instanceof Pod o) {
 				obj = convert(o);
@@ -245,7 +242,7 @@ public class K8sYamlParser {
 		return k8sApp.withImage(utils.dockerImageClean(k8sApp.getImage()));
 	}
 
-	private List<HasMetadata> parse(Path ymlFile) {
+	public List<HasMetadata> parse(Path ymlFile) {
 		try (KubernetesClient client = new KubernetesClientBuilder().build()) {
 			return client.load(Files.newInputStream(ymlFile)).items();
 		} catch (IOException e) {

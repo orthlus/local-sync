@@ -2,6 +2,7 @@ package art.aelaort.k8s;
 
 import art.aelaort.models.servers.K8sApp;
 import art.aelaort.models.servers.K8sCluster;
+import io.fabric8.kubernetes.api.model.HasMetadata;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -39,24 +40,16 @@ public class K8sClusterProvider {
 		for (Path clustersDir : getClustersDirs()) {
 			Path dir = clustersDir.resolve(k8sProps.getPathFiles());
 
+			List<HasMetadata> hasMetadataList = getYamlFiles(dir).stream()
+					.map(k8sYamlParser::parse)
+					.flatMap(Collection::stream)
+					.toList();
 			K8sCluster k8sCluster = K8sCluster.builder()
 					.name(clustersDir.getFileName().toString())
-					.apps(getYamlFiles(dir)
-							.stream()
-							.map(k8sYamlParser::parseK8sYmlFileForApps)
-							.flatMap(Collection::stream)
-							.toList())
-					.services(getYamlFiles(dir)
-							.stream()
-							.map(k8sYamlParser::parseK8sYmlFileForServices)
-							.flatMap(Collection::stream)
-							.toList())
-					.helmCharts(getYamlFiles(dir)
-							.stream()
-							.map(k8sYamlParser::parseK8sYmlFileForHelmCharts)
-							.flatMap(Collection::stream)
-							.toList()
-					)
+					.apps(k8sYamlParser.parseK8sYmlFileForApps(hasMetadataList))
+					.services(k8sYamlParser.parseK8sYmlFileForServices(hasMetadataList))
+					.helmCharts(k8sYamlParser.parseK8sYmlFileForHelmCharts(hasMetadataList))
+
 					.nodes(readNodes(clustersDir))
 					.build();
 
