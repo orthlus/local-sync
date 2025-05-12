@@ -31,6 +31,10 @@ public class K8sYamlParser {
 	private final IngressRouteParser ingressRouteParser;
 	private final HelmChartParser helmChartParser;
 
+	public List<K8sIngressRoute> parseK8sYmlFileForIngressRoutes(List<HasMetadata> hasMetadataList) {
+		return ingressRouteParser.getIngressRoutes(hasMetadataList);
+	}
+
 	public List<K8sHelmChart> parseK8sYmlFileForHelmCharts(List<HasMetadata> hasMetadataList) {
 		return helmChartParser.getChartsList(hasMetadataList);
 	}

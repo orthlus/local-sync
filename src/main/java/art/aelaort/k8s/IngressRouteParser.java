@@ -27,7 +27,7 @@ public class IngressRouteParser {
 				));
 	}
 
-	private List<K8sIngressRoute> getIngressRoutes(List<HasMetadata> k8sObjects) {
+	public List<K8sIngressRoute> getIngressRoutes(List<HasMetadata> k8sObjects) {
 		return k8sObjects.stream()
 				.filter(GenericKubernetesResource.class::isInstance)
 				.map(GenericKubernetesResource.class::cast)

@@ -49,7 +49,7 @@ public class K8sClusterProvider {
 					.apps(k8sYamlParser.parseK8sYmlFileForApps(hasMetadataList))
 					.services(k8sYamlParser.parseK8sYmlFileForServices(hasMetadataList))
 					.helmCharts(k8sYamlParser.parseK8sYmlFileForHelmCharts(hasMetadataList))
-
+					.ingressRoutes(k8sYamlParser.parseK8sYmlFileForIngressRoutes(hasMetadataList))
 					.nodes(readNodes(clustersDir))
 					.build();
 
