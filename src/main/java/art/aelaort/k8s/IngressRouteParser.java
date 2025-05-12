@@ -50,7 +50,13 @@ class IngressRouteParser {
 		if (spec == null) {
 			return Optional.empty();
 		}
-		K8sIngressRoute ingressRouteSpec = yamlMapper.convertValue(spec, K8sIngressRoute.class);
-		return Optional.of(ingressRouteSpec);
+		K8sIngressRoute ingressRoute0 = yamlMapper.convertValue(spec, K8sIngressRoute.class);
+		K8sIngressRoute ingressRoute = ingressRoute0.toBuilder()
+				.name(genericIngressRoute.getMetadata().getName())
+				.namespace(genericIngressRoute.getMetadata().getNamespace())
+				.hasTls(ingressRoute0.getTls() != null)
+				.tls(null)
+				.build();
+		return Optional.of(ingressRoute);
 	}
 }
