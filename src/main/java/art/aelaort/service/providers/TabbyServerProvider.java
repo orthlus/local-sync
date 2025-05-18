@@ -25,9 +25,17 @@ public class TabbyServerProvider {
 	private final TabbyMapper tabbyMapper;
 	@Value("${tabby.config.path}")
 	private Path tabbyConfigPath;
+	@Value("${tabby.config.inner-path}")
+	private Path tabbyConfigInnerPath;
 	@Value("${tabby.decode.password}")
 	private String decodePassword;
 
+	public List<TabbyServer> readLocalInner() {
+		TabbyFile tabbyFile = parseFile(tabbyConfigInnerPath);
+		return tabbyMapper.map(tabbyFile);
+	}
+
+	@Deprecated
 	public List<TabbyServer> readRemote() {
 		String fileContent = getRemoteFileContent();
 		save(fileContent);

@@ -21,7 +21,7 @@ public class ServerProvider {
 
 	public List<Server> scanAndJoinData(Map<String, String> mapNodesByClusterName) {
 		List<DirServer> dirServers = dirServerProvider.scanServersDir();
-		List<TabbyServer> tabbyServers = tabbyServerProvider.readRemote();
+		List<TabbyServer> tabbyServers = tabbyServerProvider.readLocalInner();
 		return joinDirAndTabbyServers(dirServers, tabbyServers, mapNodesByClusterName);
 	}
 
