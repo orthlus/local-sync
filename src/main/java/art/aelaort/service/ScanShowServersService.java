@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Map;
 
+import static art.aelaort.utils.ColoredConsoleTextUtils.wrapGreen;
 import static art.aelaort.utils.Utils.log;
 
 @Component
@@ -20,6 +21,7 @@ public class ScanShowServersService {
 	private final ExternalUtilities externalUtilities;
 	private final ServerProvider serverProvider;
 	private final K8sClusterProvider k8sClusterProvider;
+	private final GitBundleService gitBundleService;
 
 	public void sync() {
 		List<K8sCluster> clusters = k8sClusterProvider.getClusters();
@@ -29,11 +31,12 @@ public class ScanShowServersService {
 
 		serversManagementService.saveData(servers, clusters);
 		serversManagementService.saveIps(servers);
-		log("sync done");
+		log(wrapGreen("servers and apps sync finished"));
 	}
 
 	public void syncAll() {
 		sync();
+		gitBundleService.makeBundles();
 		externalUtilities.dirSync();
 	}
 }
