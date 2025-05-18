@@ -1,4 +1,4 @@
-package art.aelaort.mappers;
+package art.aelaort.service.mappers;
 
 import art.aelaort.models.servers.TabbyServer;
 import art.aelaort.models.servers.yaml.TabbyFile;

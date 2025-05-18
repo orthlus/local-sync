@@ -1,4 +1,4 @@
-package art.aelaort.k8s;
+package art.aelaort.service.mappers;
 
 import art.aelaort.models.servers.k8s.K8sIngressRoute;
 import art.aelaort.models.servers.k8s.input.IngressRouteSpec;

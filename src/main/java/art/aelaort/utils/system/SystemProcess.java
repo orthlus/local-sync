@@ -163,7 +163,7 @@ public class SystemProcess {
 					if (filter.apply(line)) {
 						log(line);
 					}
-					stdout.append(line);
+					stdout.append(line).append("\n");
 				}
 				builder.stdout(stdout.toString());
 			}

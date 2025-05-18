@@ -1,4 +1,4 @@
-package art.aelaort.k8s;
+package art.aelaort.utils;
 
 import io.fabric8.kubernetes.api.model.IntOrString;
 

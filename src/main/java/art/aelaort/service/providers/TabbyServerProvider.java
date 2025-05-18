@@ -1,10 +1,10 @@
-package art.aelaort.servers.providers;
+package art.aelaort.service.providers;
 
 import art.aelaort.CryptoJSImpl;
-import art.aelaort.mappers.TabbyMapper;
 import art.aelaort.models.servers.TabbyServer;
 import art.aelaort.models.servers.yaml.TabbyFile;
-import art.aelaort.s3.TabbyS3;
+import art.aelaort.service.mappers.TabbyMapper;
+import art.aelaort.service.s3.TabbyS3;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;

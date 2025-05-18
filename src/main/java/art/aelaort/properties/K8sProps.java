@@ -1,4 +1,4 @@
-package art.aelaort.k8s;
+package art.aelaort.properties;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -1,4 +1,4 @@
-package art.aelaort.k8s;
+package art.aelaort.service.k8s;
 
 import art.aelaort.models.servers.k8s.K8sHelmChart;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
-class HelmChartParser {
+public class HelmChartParser {
 	private final YAMLMapper yamlMapper;
 
 	public List<K8sHelmChart> getChartsList(List<HasMetadata> k8sObjects) {

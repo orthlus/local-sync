@@ -1,9 +1,9 @@
-package art.aelaort.servers.providers;
+package art.aelaort.service.providers;
 
-import art.aelaort.mappers.ServerMapper;
 import art.aelaort.models.servers.DirServer;
 import art.aelaort.models.servers.Server;
 import art.aelaort.models.servers.TabbyServer;
+import art.aelaort.service.mappers.ServerMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

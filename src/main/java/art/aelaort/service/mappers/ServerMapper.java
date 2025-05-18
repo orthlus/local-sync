@@ -1,4 +1,4 @@
-package art.aelaort.mappers;
+package art.aelaort.service.mappers;
 
 import art.aelaort.models.servers.DirServer;
 import art.aelaort.models.servers.Server;

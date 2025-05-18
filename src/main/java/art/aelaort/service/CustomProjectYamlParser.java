@@ -1,4 +1,4 @@
-package art.aelaort.servers;
+package art.aelaort.service;
 
 import art.aelaort.models.servers.DirServer;
 import art.aelaort.models.servers.ServiceDto;

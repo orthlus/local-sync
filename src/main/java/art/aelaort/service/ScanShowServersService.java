@@ -1,10 +1,9 @@
-package art.aelaort.scan_show;
+package art.aelaort.service;
 
-import art.aelaort.ServersManagementService;
-import art.aelaort.k8s.K8sClusterProvider;
 import art.aelaort.models.servers.Server;
 import art.aelaort.models.servers.k8s.K8sCluster;
-import art.aelaort.servers.providers.ServerProvider;
+import art.aelaort.service.k8s.K8sClusterProvider;
+import art.aelaort.service.providers.ServerProvider;
 import art.aelaort.utils.ExternalUtilities;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

@@ -1,7 +1,8 @@
-package art.aelaort.k8s;
+package art.aelaort.service.k8s;
 
 import art.aelaort.models.servers.k8s.K8sIngressRoute;
 import art.aelaort.models.servers.k8s.input.IngressRouteSpec;
+import art.aelaort.service.mappers.K8sIngressRouteMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import io.fabric8.kubernetes.api.model.GenericKubernetesResource;
 import io.fabric8.kubernetes.api.model.HasMetadata;
@@ -16,7 +17,7 @@ import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
-class IngressRouteParser {
+public class IngressRouteParser {
 	private final YAMLMapper yamlMapper;
 
 	public Map<String, K8sIngressRoute> getMapRoutesByServiceName(List<HasMetadata> k8sObjects) {

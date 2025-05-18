@@ -1,4 +1,4 @@
-package art.aelaort.s3;
+package art.aelaort.service.s3;
 
 import art.aelaort.S3Params;
 import art.aelaort.properties.S3Properties;

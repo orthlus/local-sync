@@ -1,9 +1,10 @@
-package art.aelaort.k8s;
+package art.aelaort.service.k8s;
 
 import art.aelaort.models.servers.k8s.K8sApp;
 import art.aelaort.models.servers.k8s.K8sHelmChart;
 import art.aelaort.models.servers.k8s.K8sIngressRoute;
 import art.aelaort.models.servers.k8s.K8sService;
+import art.aelaort.utils.K8sUtils;
 import art.aelaort.utils.Utils;
 import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.api.model.apps.DaemonSet;
@@ -21,8 +22,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import static art.aelaort.k8s.K8sUtils.unwrap;
 
 @Component
 @RequiredArgsConstructor
@@ -117,7 +116,7 @@ public class K8sYamlParser {
 		builder.port(port.getPort());
 
 		if (port.getTargetPort() != null && port.getTargetPort().getValue() != null) {
-			builder.targetPort(unwrap(port.getTargetPort()));
+			builder.targetPort(K8sUtils.unwrap(port.getTargetPort()));
 		}
 
 		if (port.getNodePort() != null) {

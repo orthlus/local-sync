@@ -1,8 +1,8 @@
-package art.aelaort.servers.providers;
+package art.aelaort.service.providers;
 
-import art.aelaort.docker.DockerComposeParser;
+import art.aelaort.service.DockerComposeParser;
 import art.aelaort.models.servers.DirServer;
-import art.aelaort.servers.CustomProjectYamlParser;
+import art.aelaort.service.CustomProjectYamlParser;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
