@@ -29,8 +29,10 @@ public class GitBundleService {
 	private Path rootDir;
 	@Value("${git.bundles.dir}")
 	private Path bundlesDir;
-	@Value("${git.bundles.exclude.prefix}")
-	private String excludePrefix;
+ 	@Value("${git.bundles.exclude.prefix-1}")
+	private String excludePrefix1;
+	@Value("${git.bundles.exclude.prefix-2}")
+	private String excludePrefix2;
 	@Value("${git.bundles.last-time-sync-file}")
 	private Path lastSyncFile;
 	private final String gitLastCommitTimestampCommand = "git show --no-patch --format=%ct";
@@ -84,7 +86,8 @@ public class GitBundleService {
 		try (Stream<Path> walk = Files.walk(rootDir, 6)) {
 			return walk
 					.filter(Files::isDirectory)
-					.filter(path -> !path.toString().contains(excludePrefix))
+					.filter(path -> !path.toString().contains(excludePrefix1))
+					.filter(path -> !path.toString().contains(excludePrefix2))
 					.filter(path -> path.resolve(".git").toFile().exists())
 					.toList();
 		} catch (IOException e) {
