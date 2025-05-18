@@ -4,8 +4,10 @@ import art.aelaort.utils.system.Response;
 import art.aelaort.utils.system.SystemProcess;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
@@ -16,6 +18,12 @@ import static art.aelaort.utils.Utils.log;
 @RequiredArgsConstructor
 public class ExternalUtilities {
 	private final SystemProcess systemProcess;
+	@Value("${cicd.inv-data.dir}")
+	private Path invDataDir;
+
+	public void commitInvData() {
+		systemProcess.callProcess(invDataDir, "git commit -am \"wip\"");
+	}
 
 	public void dirSync() {
 		Response response = systemProcess.callProcessInheritFilteredStdout(

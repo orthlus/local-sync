@@ -1,5 +1,6 @@
 package art.aelaort.service;
 
+import art.aelaort.utils.ExternalUtilities;
 import art.aelaort.utils.system.Response;
 import art.aelaort.utils.system.SystemProcess;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ import static art.aelaort.utils.Utils.log;
 @RequiredArgsConstructor
 public class GitBundleService {
 	private final SystemProcess systemProcess;
+	private final ExternalUtilities externalUtilities;
 	@Value("${root.dir}")
 	private Path rootDir;
 	@Value("${git.bundles.dir}")
@@ -33,7 +35,7 @@ public class GitBundleService {
 	private String excludePrefix1;
 	@Value("${git.bundles.exclude.prefix-2}")
 	private String excludePrefix2;
-	@Value("${git.bundles.last-time-sync-file}")
+	@Value("${git.bundles.last-git-time-sync-file}")
 	private Path lastSyncFile;
 	private final String gitLastCommitTimestampCommand = "git show --no-patch --format=%ct";
 	private final String gitBundleCommand = "git bundle create %s --all";
@@ -49,6 +51,7 @@ public class GitBundleService {
 	private void saveTimestamp() {
 		try {
 			Files.writeString(lastSyncFile, String.valueOf(Instant.now().getEpochSecond()));
+			externalUtilities.commitInvData();
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
