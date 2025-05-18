@@ -12,17 +12,7 @@ import org.springframework.stereotype.Component;
 public class S3Properties {
 	String endpoint;
 	String region;
-	Tabby tabby;
 	ServersManagement serversManagement;
-
-	@Getter
-	@Setter
-	public static class Tabby {
-		String id;
-		String key;
-		String bucket;
-		String file;
-	}
 
 	@Getter
 	@Setter

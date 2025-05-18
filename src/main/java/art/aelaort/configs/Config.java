@@ -27,15 +27,6 @@ public class Config {
 	}
 
 	@Bean
-	public S3Params tabbyS3Params() {
-		return new DefaultS3Params(
-				properties.getTabby().getId(),
-				properties.getTabby().getKey(),
-				properties.getEndpoint(),
-				properties.getRegion());
-	}
-
-	@Bean
 	public S3Params serversManagementS3Params() {
 		return new DefaultS3Params(
 				properties.getServersManagement().getId(),
