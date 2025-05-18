@@ -4,7 +4,6 @@ import art.aelaort.models.servers.Server;
 import art.aelaort.models.servers.k8s.K8sCluster;
 import art.aelaort.properties.K8sProps;
 import art.aelaort.service.s3.ServersManagementS3;
-import art.aelaort.utils.ExternalUtilities;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -24,7 +23,6 @@ public class ServersManagementService {
 	private final ServersManagementS3 serversManagementS3;
 	private final JsonMapper jsonMapper;
 	private final K8sProps k8sProps;
-	private final ExternalUtilities externalUtilities;
 	@Value("${servers.management.json_path}")
 	private Path jsonDataPath;
 
@@ -46,8 +44,6 @@ public class ServersManagementService {
 
 		String jsonK8s = toJsonK8s(clusters);
 		saveK8sJsonToLocal(jsonK8s);
-
-		externalUtilities.commitInvData();
 
 		log("saved data to local");
 

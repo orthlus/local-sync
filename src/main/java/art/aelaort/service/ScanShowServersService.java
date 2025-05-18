@@ -4,6 +4,7 @@ import art.aelaort.models.servers.Server;
 import art.aelaort.models.servers.k8s.K8sCluster;
 import art.aelaort.service.k8s.K8sClusterProvider;
 import art.aelaort.service.providers.ServerProvider;
+import art.aelaort.service.providers.TabbyServerProvider;
 import art.aelaort.utils.ExternalUtilities;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -22,6 +23,7 @@ public class ScanShowServersService {
 	private final ServerProvider serverProvider;
 	private final K8sClusterProvider k8sClusterProvider;
 	private final GitBundleService gitBundleService;
+	private final TabbyServerProvider tabbyServerProvider;
 
 	public void sync() {
 		List<K8sCluster> clusters = k8sClusterProvider.getClusters();
@@ -31,6 +33,7 @@ public class ScanShowServersService {
 
 		serversManagementService.saveData(servers, clusters);
 		serversManagementService.saveIps(servers);
+		tabbyServerProvider.copyToRepo();
 		log(wrapGreen("servers and apps sync finished"));
 	}
 
