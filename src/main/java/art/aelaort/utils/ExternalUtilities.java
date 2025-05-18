@@ -29,6 +29,7 @@ public class ExternalUtilities {
 		List<String> projects = getProjects(response.stdout());
 		int projectsCount = projects.size();
 		if (projectsCount > 0) {
+			log();
 			log("synced %d .idea projects:\n", projectsCount);
 			projects.forEach(Utils::log);
 			log();
