@@ -13,7 +13,9 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.TimeZone;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static art.aelaort.utils.ColoredConsoleTextUtils.wrapGreen;
@@ -40,10 +42,24 @@ public class GitBundleService {
 
 	public void makeBundles() {
 		List<Path> gitRepos = getGitRepos();
-		gitRepos = filterGitRepos(gitRepos);
-		makeBundles(gitRepos);
+		Set<String> currentBundles = getCurrentBundles();
+		gitRepos = filterGitRepos(gitRepos, currentBundles);
+		makeBundles(gitRepos, currentBundles);
 		saveTimestamp();
 		log(wrapGreen("git bundles created"));
+	}
+
+	private Set<String> getCurrentBundles() {
+		try (Stream<Path> list = Files.list(bundlesDir)) {
+			return list
+					.map(Path::getFileName)
+					.map(Path::toString)
+					.filter(string -> string.endsWith(".bundle"))
+					.collect(Collectors.toSet());
+		} catch (IOException e) {
+			log(wrapRed("Error getting current git bundles"));
+			return Set.of();
+		}
 	}
 
 	private void saveTimestamp() {
@@ -54,9 +70,12 @@ public class GitBundleService {
 		}
 	}
 
-	private void makeBundles(List<Path> gitRepos) {
+	private void makeBundles(List<Path> gitRepos, Set<String> currentBundles) {
 		for (Path gitRepo : gitRepos) {
 			String bundleName = gitRepo.getFileName().toString() + ".bundle";
+			if (currentBundles.contains(bundleName)) {
+				continue;
+			}
 			String bundleCommand = gitBundleCommand.formatted(bundlesDir.resolve(bundleName));
 			Response response = systemProcess.callProcess(gitRepo, bundleCommand);
 			if (response.exitCode() != 0) {
@@ -65,10 +84,15 @@ public class GitBundleService {
 		}
 	}
 
-	private List<Path> filterGitRepos(List<Path> gitRepos) {
+	private List<Path> filterGitRepos(List<Path> gitRepos, Set<String> currentBundles) {
 		LocalDateTime lastSyncTime = getLastSyncTime();
 		List<Path> filteredGitRepos = new ArrayList<>(gitRepos.size());
 		for (Path gitRepo : gitRepos) {
+			String bundleName = gitRepo.getFileName().toString() + ".bundle";
+			if (!currentBundles.contains(bundleName)) {
+				filteredGitRepos.add(gitRepo);
+				continue;
+			}
 			Response response = systemProcess.callProcess(gitRepo, gitLastCommitTimestampCommand);
 			if (response.exitCode() != 0) {
 				log(wrapRed("call git with error:\n") + "%s\n%s".formatted(response.stderr(), response.stdout()));
