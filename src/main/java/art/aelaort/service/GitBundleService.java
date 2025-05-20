@@ -44,7 +44,7 @@ public class GitBundleService {
 		List<Path> gitRepos = getGitRepos();
 		Set<String> currentBundles = getCurrentBundles();
 		gitRepos = filterGitRepos(gitRepos, currentBundles);
-		makeBundles(gitRepos, currentBundles);
+		makeBundles(gitRepos);
 		saveTimestamp();
 		log(wrapGreen("git bundles created"));
 	}
@@ -70,12 +70,9 @@ public class GitBundleService {
 		}
 	}
 
-	private void makeBundles(List<Path> gitRepos, Set<String> currentBundles) {
+	private void makeBundles(List<Path> gitRepos) {
 		for (Path gitRepo : gitRepos) {
 			String bundleName = gitRepo.getFileName().toString() + ".bundle";
-			if (currentBundles.contains(bundleName)) {
-				continue;
-			}
 			String bundleCommand = gitBundleCommand.formatted(bundlesDir.resolve(bundleName));
 			Response response = systemProcess.callProcess(gitRepo, bundleCommand);
 			if (response.exitCode() != 0) {
