@@ -24,6 +24,7 @@ public class ScanShowServersService {
 	private final K8sClusterProvider k8sClusterProvider;
 	private final GitBundleService gitBundleService;
 	private final TabbyServerProvider tabbyServerProvider;
+	private final OutputJsonService outputJsonService;
 
 	public void sync() {
 		List<K8sCluster> clusters = k8sClusterProvider.getClusters();
@@ -33,6 +34,11 @@ public class ScanShowServersService {
 
 		serversManagementService.saveData(servers, clusters);
 		serversManagementService.saveIps(servers);
+
+		outputJsonService.saveApps(servers);
+		outputJsonService.saveServers(servers);
+		outputJsonService.saveK8sApps(clusters);
+
 		tabbyServerProvider.copyToRepo();
 		log(wrapGreen("servers and apps sync finished"));
 	}
