@@ -31,7 +31,7 @@ public class GitBundleService {
 	private Path rootDir;
 	@Value("${git.bundles.dir}")
 	private Path bundlesDir;
- 	@Value("${git.bundles.exclude.prefix-1}")
+	@Value("${git.bundles.exclude.prefix-1}")
 	private String excludePrefix1;
 	@Value("${git.bundles.exclude.prefix-2}")
 	private String excludePrefix2;
@@ -72,7 +72,7 @@ public class GitBundleService {
 
 	private void makeBundles(List<Path> gitRepos) {
 		for (Path gitRepo : gitRepos) {
-			String bundleName = gitRepo.getFileName().toString() + ".bundle";
+			String bundleName = bundleName(gitRepo);
 			String bundleCommand = gitBundleCommand.formatted(bundlesDir.resolve(bundleName));
 			Response response = systemProcess.callProcess(gitRepo, bundleCommand);
 			if (response.exitCode() != 0) {
@@ -85,8 +85,7 @@ public class GitBundleService {
 		LocalDateTime lastSyncTime = getLastSyncTime();
 		List<Path> filteredGitRepos = new ArrayList<>(gitRepos.size());
 		for (Path gitRepo : gitRepos) {
-			String bundleName = gitRepo.getFileName().toString() + ".bundle";
-			if (!currentBundles.contains(bundleName)) {
+			if (!currentBundles.contains(bundleName(gitRepo))) {
 				filteredGitRepos.add(gitRepo);
 				continue;
 			}
@@ -115,6 +114,11 @@ public class GitBundleService {
 			log(wrapRed("Error getting git repositories"));
 			return List.of();
 		}
+	}
+
+	private String bundleName(Path gitRepo) {
+		String parent = gitRepo.getParent().getFileName().toString().replace(" ", "-");
+		return "%s--%s.bundle".formatted(parent, gitRepo.getFileName());
 	}
 
 	private LocalDateTime getLastSyncTime() {
