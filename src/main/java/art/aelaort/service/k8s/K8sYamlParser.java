@@ -4,7 +4,6 @@ import art.aelaort.models.servers.k8s.K8sApp;
 import art.aelaort.models.servers.k8s.K8sHelmChart;
 import art.aelaort.models.servers.k8s.K8sIngressRoute;
 import art.aelaort.models.servers.k8s.K8sService;
-import art.aelaort.utils.K8sUtils;
 import art.aelaort.utils.Utils;
 import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.api.model.apps.DaemonSet;
@@ -116,7 +115,7 @@ public class K8sYamlParser {
 		builder.port(port.getPort());
 
 		if (port.getTargetPort() != null && port.getTargetPort().getValue() != null) {
-			builder.targetPort(K8sUtils.unwrap(port.getTargetPort()));
+			builder.targetPort(unwrap(port.getTargetPort()));
 		}
 
 		if (port.getNodePort() != null) {
@@ -230,6 +229,18 @@ public class K8sYamlParser {
 			return resources.getLimits().get("memory").toString();
 		} catch (NullPointerException e) {
 			return "-";
+		}
+	}
+
+	private String unwrap(IntOrString intOrString) {
+		if (intOrString == null) {
+			return null;
+		}
+
+		if (intOrString.getStrVal() != null) {
+			return intOrString.getStrVal();
+		} else {
+			return String.valueOf(intOrString.getIntVal());
 		}
 	}
 
