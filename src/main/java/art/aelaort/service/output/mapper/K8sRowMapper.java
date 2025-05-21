@@ -59,9 +59,9 @@ public class K8sRowMapper {
 						app.getImagePullPolicy(),
 						servicePortsString(service),
 						serviceType(service),
+						serviceRoute(service),
 						app.getMemoryLimit(),
-						app.getStrategyType(),
-						serviceRoute(service)
+						app.getStrategyType()
 				);
 				res.add(clusterAppRow);
 			}
