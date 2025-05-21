@@ -1,6 +1,7 @@
 package art.aelaort.service.output.mapper;
 
-import art.aelaort.models.servers.display.ClusterAppRow;
+import art.aelaort.models.servers.display.K8sAppRow;
+import art.aelaort.models.servers.display.K8sCronJobRow;
 import art.aelaort.models.servers.k8s.K8sApp;
 import art.aelaort.models.servers.k8s.K8sCluster;
 import art.aelaort.models.servers.k8s.K8sHelmChart;
@@ -15,14 +16,40 @@ import java.util.Map;
 import static org.springframework.util.StringUtils.hasText;
 
 @Component
-public class ClusterAppRowMapper {
-	public List<ClusterAppRow> mapToClusterAppRows(List<K8sCluster> clusters) {
-		List<ClusterAppRow> res = new ArrayList<>();
+public class K8sRowMapper {
+	public List<K8sCronJobRow> mapToCronJobRows(List<K8sCluster> clusters) {
+		List<K8sCronJobRow> res = new ArrayList<>();
+		for (K8sCluster cluster : clusters) {
+			for (K8sApp app : cluster.apps()) {
+				if (app.getSchedule() == null) {
+					continue;
+				}
+				K8sCronJobRow k8sCronJobRow = new K8sCronJobRow(
+						null,
+						cluster.name(),
+						app.getNamespace(),
+						app.getImage(),
+						app.getName(),
+						app.getImagePullPolicy(),
+						app.getSchedule(),
+						app.getMemoryLimit());
+
+				res.add(k8sCronJobRow);
+			}
+		}
+		return res;
+	}
+
+	public List<K8sAppRow> mapToAppRows(List<K8sCluster> clusters) {
+		List<K8sAppRow> res = new ArrayList<>();
 		for (K8sCluster cluster : clusters) {
 			Map<String, K8sService> serviceByPodNameMap = makeServiceByPodNameMap(cluster);
 			for (K8sApp app : cluster.apps()) {
+				if (app.getSchedule() != null) {
+					continue;
+				}
 				K8sService service = serviceByPodNameMap.get(app.getPodName());
-				ClusterAppRow clusterAppRow = new ClusterAppRow(
+				K8sAppRow clusterAppRow = new K8sAppRow(
 						null,
 						cluster.name(),
 						app.getNamespace(),
@@ -32,7 +59,6 @@ public class ClusterAppRowMapper {
 						app.getImagePullPolicy(),
 						servicePortsString(service),
 						serviceType(service),
-						app.getSchedule(),
 						app.getMemoryLimit(),
 						app.getStrategyType(),
 						serviceRoute(service)
@@ -41,14 +67,14 @@ public class ClusterAppRowMapper {
 			}
 
 			for (K8sHelmChart helmChart : cluster.helmCharts()) {
-				ClusterAppRow clusterAppRow = new ClusterAppRow(
+				K8sAppRow clusterAppRow = new K8sAppRow(
 						null,
 						cluster.name(),
 						helmChart.getTargetNamespace(),
 						helmChart.getRepo(),
 						helmChart.getChart(),
 						"HC",
-						null, null, null, null, null, null, null
+						null, null, null, null, null, null
 				);
 				res.add(clusterAppRow);
 			}
