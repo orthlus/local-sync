@@ -30,8 +30,8 @@ public class K8sRowMapper {
 						app.getNamespace(),
 						app.getImage(),
 						app.getName(),
-						app.getImagePullPolicy(),
 						app.getSchedule(),
+						app.getImagePullPolicy(),
 						app.getMemoryLimit());
 
 				res.add(k8sCronJobRow);
