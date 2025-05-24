@@ -25,7 +25,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OutputJsonService {
 	private final K8sRowMapper k8sRowMapper;
-	private final ObjectMapper jacksonObjectMapper;
+	private final ObjectMapper prettyObjectMapper;
 	private final AppRowMapper appRowMapper;
 	private final ServerRowMapper serverRowMapper;
 	private final RestTemplate serversUiRestTemplate;
@@ -71,7 +71,7 @@ public class OutputJsonService {
 
 	private String writeJson(List<?> rows) {
 		try {
-			return jacksonObjectMapper.writeValueAsString(rows);
+			return prettyObjectMapper.writeValueAsString(rows);
 		} catch (JsonProcessingException e) {
 			throw new RuntimeException(e);
 		}

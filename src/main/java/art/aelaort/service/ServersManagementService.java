@@ -4,7 +4,7 @@ import art.aelaort.models.servers.Server;
 import art.aelaort.models.servers.k8s.K8sCluster;
 import art.aelaort.properties.K8sProps;
 import art.aelaort.service.s3.ServersManagementS3;
-import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,7 +21,7 @@ import static art.aelaort.utils.Utils.log;
 @RequiredArgsConstructor
 public class ServersManagementService {
 	private final ServersManagementS3 serversManagementS3;
-	private final JsonMapper jsonMapper;
+	private final ObjectMapper prettyObjectMapper;
 	private final K8sProps k8sProps;
 	@Value("${servers.management.json_path}")
 	private Path jsonDataPath;
@@ -54,7 +54,7 @@ public class ServersManagementService {
 
 	@SneakyThrows
 	private String toJson(List<Server> server) {
-		return jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(server);
+		return prettyObjectMapper.writeValueAsString(server);
 	}
 
 	@SneakyThrows
@@ -64,7 +64,7 @@ public class ServersManagementService {
 
 	@SneakyThrows
 	private String toJsonK8s(List<K8sCluster> clusters) {
-		return jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(clusters);
+		return prettyObjectMapper.writeValueAsString(clusters);
 	}
 
 	@SneakyThrows

@@ -3,7 +3,8 @@ package art.aelaort.configs;
 import art.aelaort.DefaultS3Params;
 import art.aelaort.S3Params;
 import art.aelaort.properties.S3Properties;
-import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -22,8 +23,8 @@ public class Config {
 
 	@Bean
 	@Primary
-	public JsonMapper jsonMapper() {
-		return new JsonMapper();
+	public ObjectMapper prettyObjectMapper() {
+		return new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
 	}
 
 	@Bean
