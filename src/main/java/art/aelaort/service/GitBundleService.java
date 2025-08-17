@@ -106,8 +106,8 @@ public class GitBundleService {
 		try (Stream<Path> walk = Files.walk(rootDir, 6)) {
 			return walk
 					.filter(Files::isDirectory)
-					.filter(path -> !path.toString().contains(excludePrefix1))
-					.filter(path -> !path.toString().contains(excludePrefix2))
+//					.filter(path -> !path.toString().contains(excludePrefix1))
+//					.filter(path -> !path.toString().contains(excludePrefix2))
 					.filter(path -> path.resolve(".git").toFile().exists())
 					.toList();
 		} catch (IOException e) {
