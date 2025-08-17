@@ -12,11 +12,13 @@ import static art.aelaort.utils.Utils.log;
 public class Entrypoint implements CommandLineRunner {
 	private final ScanShowServersService scanShow;
 	private final ExternalUtilities externalUtilities;
+	private final GitBundleService gitBundleService;
 
 	@Override
 	public void run(String... args) {
 		if (args.length >= 1) {
 			switch (args[0]) {
+				case "git-bundle-all" -> gitBundleService.bundleAll();
 				case "sync", "s" -> scanShow.sync();
 				case "sync-all", "sa" -> scanShow.syncAll();
 				default -> log("unknown args\n" + usage());
@@ -33,6 +35,7 @@ public class Entrypoint implements CommandLineRunner {
 		return """
 				usage:
 					sync, s        - quick sync
-					sync-all, sa   - long sync all data""";
+					sync-all, sa   - long sync all data
+					git-bundle-all - bundle all repos to another dir, no save timestamp""";
 	}
 }

@@ -31,6 +31,8 @@ public class GitBundleService {
 	private Path rootDir;
 	@Value("${git.bundles.dir}")
 	private Path bundlesDir;
+	@Value("${git.bundles.all-dir}")
+	private Path allBundlesDir;
 	@Value("${git.bundles.exclude.prefix-1}")
 	private String excludePrefix1;
 	@Value("${git.bundles.exclude.prefix-2}")
@@ -40,11 +42,17 @@ public class GitBundleService {
 	private final String gitLastCommitTimestampCommand = "git show --no-patch --format=%ct";
 	private final String gitBundleCommand = "git bundle create %s --all";
 
+	public void bundleAll() {
+		List<Path> gitRepos = getGitReposAll();
+		makeBundles(gitRepos, allBundlesDir);
+		log(wrapGreen("git bundles created"));
+	}
+
 	public void makeBundles() {
 		List<Path> gitRepos = getGitRepos();
 		Set<String> currentBundles = getCurrentBundles();
 		gitRepos = filterGitRepos(gitRepos, currentBundles);
-		makeBundles(gitRepos);
+		makeBundles(gitRepos, bundlesDir);
 		saveTimestamp();
 		log(wrapGreen("git bundles created"));
 	}
@@ -70,7 +78,7 @@ public class GitBundleService {
 		}
 	}
 
-	private void makeBundles(List<Path> gitRepos) {
+	private void makeBundles(List<Path> gitRepos, Path bundlesDir) {
 		for (Path gitRepo : gitRepos) {
 			String bundleName = bundleName(gitRepo);
 			String bundleCommand = gitBundleCommand.formatted(bundlesDir.resolve(bundleName));
@@ -102,12 +110,24 @@ public class GitBundleService {
 		return filteredGitRepos;
 	}
 
+	private List<Path> getGitReposAll() {
+		try (Stream<Path> walk = Files.walk(rootDir, 6)) {
+			return walk
+					.filter(Files::isDirectory)
+					.filter(path -> path.resolve(".git").toFile().exists())
+					.toList();
+		} catch (IOException e) {
+			log(wrapRed("Error getting git repositories"));
+			return List.of();
+		}
+	}
+
 	private List<Path> getGitRepos() {
 		try (Stream<Path> walk = Files.walk(rootDir, 6)) {
 			return walk
 					.filter(Files::isDirectory)
-//					.filter(path -> !path.toString().contains(excludePrefix1))
-//					.filter(path -> !path.toString().contains(excludePrefix2))
+					.filter(path -> !path.toString().contains(excludePrefix1))
+					.filter(path -> !path.toString().contains(excludePrefix2))
 					.filter(path -> path.resolve(".git").toFile().exists())
 					.toList();
 		} catch (IOException e) {
