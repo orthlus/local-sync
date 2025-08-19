@@ -79,12 +79,23 @@ public class GitBundleService {
 	}
 
 	private void makeBundles(List<Path> gitRepos, Path bundlesDir) {
+		mkdir(bundlesDir);
 		for (Path gitRepo : gitRepos) {
 			String bundleName = bundleName(gitRepo);
 			String bundleCommand = gitBundleCommand.formatted(bundlesDir.resolve(bundleName));
 			Response response = systemProcess.callProcess(gitRepo, bundleCommand);
 			if (response.exitCode() != 0) {
 				log(wrapRed("call git bundle with error:\n") + "%s\n%s".formatted(response.stderr(), response.stdout()));
+			}
+		}
+	}
+
+	private static void mkdir(Path bundlesDir) {
+		if (Files.notExists(bundlesDir)) {
+			try {
+				Files.createDirectory(bundlesDir);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
 			}
 		}
 	}
