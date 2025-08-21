@@ -5,13 +5,19 @@ import art.aelaort.exceptions.AppPrintUsageException;
 import art.aelaort.utils.Utils;
 import art.aelaort.utils.system.Response;
 import art.aelaort.utils.system.SystemProcess;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.apache.commons.io.FilenameUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.Optional;
 
 import static art.aelaort.utils.ColoredConsoleTextUtils.wrapRed;
@@ -24,7 +30,16 @@ import static art.aelaort.utils.Utils.log;
 public class GitDirCopyService {
 	private final SystemProcess systemProcess;
 	private final Utils utils;
+	private final ObjectMapper prettyObjectMapper;
+	@Value("${git.bundles.remotes-urls-by-bundle-file}")
+	private Path remotesUrlsByBundleFile;
+	private Map<String, String> remoteUrls;
 	private static final String DOT_GIT = ".git";
+
+	@PostConstruct
+	private void init() {
+		remoteUrls = readRemoteUrls();
+	}
 
 	public void copyAll() {
 		// TODO обходить все папки в root.dir, искать репы, для каждой искать бандл в git.bundles.all-dir и вызывать copy()
@@ -69,9 +84,18 @@ public class GitDirCopyService {
 		deleteDir(targetGit);
 		copyDirectory(bundleGitDirOp.get(), targetProjectDir.resolve(DOT_GIT));
 		callGitAdd(targetProjectDir);
-		updateGitRemoteUrl(targetProjectDir, "");
+
+		String remoteUrl = remoteUrls.get(bundlePath.getFileName().toString());
+		if (remoteUrl != null) {
+			updateGitRemoteUrl(targetProjectDir, remoteUrl);
+		}
 
 		deleteDir(tmp);
+	}
+
+	@SneakyThrows
+	private Map<String, String> readRemoteUrls() {
+		return prettyObjectMapper.readValue(remotesUrlsByBundleFile.toFile(), remotesJsonType());
 	}
 
 	private void updateGitRemoteUrl(Path tmp, String url) {
@@ -109,5 +133,10 @@ public class GitDirCopyService {
 			log(wrapRed("not found file " + bundlePath));
 			throw new AppExitErrorException();
 		}
+	}
+
+	private TypeReference<Map<String, String>> remotesJsonType() {
+		return new TypeReference<>() {
+		};
 	}
 }
