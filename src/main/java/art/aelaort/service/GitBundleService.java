@@ -1,5 +1,7 @@
 package art.aelaort.service;
 
+import art.aelaort.utils.GitUtils;
+import art.aelaort.utils.Utils;
 import art.aelaort.utils.system.Response;
 import art.aelaort.utils.system.SystemProcess;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,6 +30,7 @@ import static art.aelaort.utils.Utils.log;
 public class GitBundleService {
 	private final SystemProcess systemProcess;
 	private final ObjectMapper prettyObjectMapper;
+	private final Utils utils;
 	@Value("${root.dir}")
 	private Path rootDir;
 	@Value("${git.bundles.dir}")
@@ -47,9 +50,19 @@ public class GitBundleService {
 	private final String gitGetRemoteUrlCommand = "git config --get remote.origin.url";
 
 	public void bundleAll() {
+		Path tmp = utils.createTmpDir();
+
 		List<Path> gitRepos = getGitReposAll();
-		makeBundles(gitRepos, allBundlesDir);
+
+		makeBundles(gitRepos, tmp);
+//		makeBundles(gitRepos, allBundlesDir);
+
+		deleteDir(allBundlesDir);
+		mkdir(allBundlesDir);
+		GitUtils.copyDirectory(tmp, allBundlesDir);
 		log(wrapGreen("git bundles created"));
+
+		deleteDir(tmp);
 	}
 
 	public void makeBundles() {
