@@ -100,8 +100,12 @@ public class GitBundleService {
 				log(wrapRed("call git bundle with error:\n") + "%s\n%s".formatted(response.stderr(), response.stdout()));
 			}
 
-			Response gitRemoteResp = systemProcess.callProcessThrows(gitRepo, gitGetRemoteUrlCommand);
-			gitRemotesByBundleName.put(bundleName, gitRemoteResp.stdout().strip());
+			Response gitRemoteResp = systemProcess.callProcess(gitRepo, gitGetRemoteUrlCommand);
+			if (gitRemoteResp.exitCode() != 0) {
+				gitRemotesByBundleName.put(bundleName, gitRemoteResp.stdout().strip());
+			} else {
+				gitRemotesByBundleName.put(bundleName, null);
+			}
 			if (log) {
 				log(wrapGreen("bundle %s created".formatted(bundleName)));
 			}
