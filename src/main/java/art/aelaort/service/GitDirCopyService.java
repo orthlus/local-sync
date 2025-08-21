@@ -24,6 +24,7 @@ import static art.aelaort.utils.Utils.log;
 public class GitDirCopyService {
 	private final SystemProcess systemProcess;
 	private final Utils utils;
+	private static final String DOT_GIT = ".git";
 
 	public void copy(String[] args) {
 		if (args.length != 2) {
@@ -42,7 +43,7 @@ public class GitDirCopyService {
 	public void copy(Path targetProjectDir, Path bundlePath) {
 		checkParams(targetProjectDir, bundlePath);
 
-		Path targetGit = targetProjectDir.resolve(".git");
+		Path targetGit = targetProjectDir.resolve(DOT_GIT);
 		if (Files.notExists(targetGit)) {
 			log(wrapRed("target .git not exists"));
 			throw new AppExitErrorException();
@@ -62,7 +63,7 @@ public class GitDirCopyService {
 		}
 
 		FileUtils.deleteQuietly(targetGit.toFile());
-		copyDirectory(targetProjectDir.resolve(".git"), bundleGitDirOp.get());
+		copyDirectory(targetProjectDir.resolve(DOT_GIT), bundleGitDirOp.get());
 
 
 		FileUtils.deleteQuietly(tmp.toFile());
@@ -83,7 +84,7 @@ public class GitDirCopyService {
 			return Optional.empty();
 		}
 
-		Path gitDir = projectDir.resolve(".git");
+		Path gitDir = projectDir.resolve(DOT_GIT);
 		if (Files.notExists(gitDir)) {
 			return Optional.empty();
 		}
