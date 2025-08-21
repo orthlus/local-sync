@@ -10,6 +10,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
@@ -38,8 +39,14 @@ public class GitDirCopyService {
 		}
 	}
 
-	public void copy(Path gitDir, Path bundlePath) {
-		checkParams(gitDir, bundlePath);
+	public void copy(Path targetProjectDir, Path bundlePath) {
+		checkParams(targetProjectDir, bundlePath);
+
+		Path targetGit = targetProjectDir.resolve(".git");
+		if (Files.notExists(targetGit)) {
+			log(wrapRed("target .git not exists"));
+			throw new AppExitErrorException();
+		}
 
 		Path tmp = utils.createTmpDir();
 		Response response = extractBundle(bundlePath, tmp);
@@ -48,10 +55,25 @@ public class GitDirCopyService {
 			throw new AppExitErrorException();
 		}
 
-		Optional<Path> gitDirOp = getGitDir(tmp, bundlePath);
+		Optional<Path> bundleGitDirOp = getGitDir(tmp, bundlePath);
+		if (bundleGitDirOp.isEmpty()) {
+			log(wrapRed("bundle git extract error"));
+			throw new AppExitErrorException();
+		}
+
+		FileUtils.deleteQuietly(targetGit.toFile());
+		copyDirectory(targetProjectDir, bundleGitDirOp.get());
 
 
 		FileUtils.deleteQuietly(tmp.toFile());
+	}
+
+	private static void copyDirectory(Path targetProjectDir, Path bundleGitDir) {
+		try {
+			FileUtils.copyDirectory(bundleGitDir.toFile(), targetProjectDir.toFile());
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	private static Optional<Path> getGitDir(Path tmp, Path bundlePath) {
