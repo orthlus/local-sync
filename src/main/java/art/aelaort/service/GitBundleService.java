@@ -101,7 +101,7 @@ public class GitBundleService {
 			}
 
 			Response gitRemoteResp = systemProcess.callProcess(gitRepo, gitGetRemoteUrlCommand);
-			if (gitRemoteResp.exitCode() != 0) {
+			if (gitRemoteResp.exitCode() == 0) {
 				gitRemotesByBundleName.put(bundleName, gitRemoteResp.stdout().strip());
 			} else {
 				gitRemotesByBundleName.put(bundleName, null);
