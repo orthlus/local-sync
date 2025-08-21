@@ -2,6 +2,7 @@ package art.aelaort.service;
 
 import art.aelaort.utils.system.Response;
 import art.aelaort.utils.system.SystemProcess;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,6 +26,7 @@ import static art.aelaort.utils.Utils.log;
 @RequiredArgsConstructor
 public class GitBundleService {
 	private final SystemProcess systemProcess;
+	private final ObjectMapper prettyObjectMapper;
 	@Value("${root.dir}")
 	private Path rootDir;
 	@Value("${git.bundles.dir}")
@@ -37,8 +39,11 @@ public class GitBundleService {
 	private String excludePrefix2;
 	@Value("${git.bundles.last-git-time-sync-file}")
 	private Path lastSyncFile;
+	@Value("${git.bundles.remotes-urls-by-bundle-file}")
+	private Path remotesUrlsByBundleFile;
 	private final String gitLastCommitTimestampCommand = "git show --no-patch --format=%ct";
 	private final String gitBundleCommand = "git bundle create %s --all";
+	private final String gitGetRemoteUrlCommand = "git config --get remote.origin.url";
 
 	public void bundleAll() {
 		List<Path> gitRepos = getGitReposAll();
@@ -70,14 +75,22 @@ public class GitBundleService {
 
 	private void makeBundles(List<Path> gitRepos, Path bundlesDir) {
 		mkdir(bundlesDir);
+		Map<String, String> gitRemotesByBundleName = new HashMap<>();
+
 		for (Path gitRepo : gitRepos) {
 			String bundleName = bundleName(gitRepo);
 			String bundleCommand = gitBundleCommand.formatted(bundlesDir.resolve(bundleName));
+
 			Response response = systemProcess.callProcess(gitRepo, bundleCommand);
 			if (response.exitCode() != 0) {
 				log(wrapRed("call git bundle with error:\n") + "%s\n%s".formatted(response.stderr(), response.stdout()));
 			}
+
+			Response gitRemoteResp = systemProcess.callProcessThrows(gitRepo, gitGetRemoteUrlCommand);
+			gitRemotesByBundleName.put(bundleName, gitRemoteResp.stdout().strip());
 		}
+
+		saveRemotesMap(gitRemotesByBundleName);
 	}
 
 	private List<Path> filterGitRepos(List<Path> gitRepos, Set<String> currentBundles) {
@@ -130,6 +143,11 @@ public class GitBundleService {
 	private String bundleName(Path gitRepo) {
 		String parent = gitRepo.getParent().getFileName().toString().replace(" ", "-");
 		return "%s--%s.bundle".formatted(parent, gitRepo.getFileName());
+	}
+
+	@SneakyThrows
+	private void saveRemotesMap(Map<String, String> gitRemotesByBundleName) {
+		Files.writeString(remotesUrlsByBundleFile, prettyObjectMapper.writeValueAsString(gitRemotesByBundleName));
 	}
 
 	@SneakyThrows
