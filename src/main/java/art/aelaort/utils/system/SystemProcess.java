@@ -102,7 +102,7 @@ public class SystemProcess {
 	public Response callProcessThrows(Path dir, String... command) {
 		Response response = callProcess(dir, command);
 		if (response.exitCode() != 0) {
-			throw new RuntimeException(response.stderr());
+			throw new RuntimeException(response.stdout() + ", " + response.stderr());
 		}
 		return response;
 	}
