@@ -62,7 +62,7 @@ public class GitDirCopyService {
 		}
 
 		FileUtils.deleteQuietly(targetGit.toFile());
-		copyDirectory(targetProjectDir, bundleGitDirOp.get());
+		copyDirectory(targetProjectDir.resolve(".git"), bundleGitDirOp.get());
 
 
 		FileUtils.deleteQuietly(tmp.toFile());
