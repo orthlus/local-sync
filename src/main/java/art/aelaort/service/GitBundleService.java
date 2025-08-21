@@ -3,6 +3,7 @@ package art.aelaort.service;
 import art.aelaort.utils.system.Response;
 import art.aelaort.utils.system.SystemProcess;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -11,10 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.TimeZone;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -70,14 +68,6 @@ public class GitBundleService {
 		}
 	}
 
-	private void saveTimestamp() {
-		try {
-			Files.writeString(lastSyncFile, String.valueOf(Instant.now().getEpochSecond()));
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
 	private void makeBundles(List<Path> gitRepos, Path bundlesDir) {
 		mkdir(bundlesDir);
 		for (Path gitRepo : gitRepos) {
@@ -86,16 +76,6 @@ public class GitBundleService {
 			Response response = systemProcess.callProcess(gitRepo, bundleCommand);
 			if (response.exitCode() != 0) {
 				log(wrapRed("call git bundle with error:\n") + "%s\n%s".formatted(response.stderr(), response.stdout()));
-			}
-		}
-	}
-
-	private static void mkdir(Path bundlesDir) {
-		if (Files.notExists(bundlesDir)) {
-			try {
-				Files.createDirectory(bundlesDir);
-			} catch (IOException e) {
-				throw new RuntimeException(e);
 			}
 		}
 	}
@@ -152,15 +132,24 @@ public class GitBundleService {
 		return "%s--%s.bundle".formatted(parent, gitRepo.getFileName());
 	}
 
+	@SneakyThrows
+	private void saveTimestamp() {
+		Files.writeString(lastSyncFile, String.valueOf(Instant.now().getEpochSecond()));
+	}
+
+	@SneakyThrows
+	private static void mkdir(Path bundlesDir) {
+		if (Files.notExists(bundlesDir)) {
+			Files.createDirectory(bundlesDir);
+		}
+	}
+
+	@SneakyThrows
 	private LocalDateTime getLastSyncTime() {
-		try {
-			if (Files.exists(lastSyncFile)) {
-				return parseGitDate(Files.readString(lastSyncFile).trim());
-			} else {
-				return LocalDateTime.now();
-			}
-		} catch (IOException e) {
-			throw new RuntimeException(e);
+		if (Files.exists(lastSyncFile)) {
+			return parseGitDate(Files.readString(lastSyncFile).trim());
+		} else {
+			return LocalDateTime.now();
 		}
 	}
 
