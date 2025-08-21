@@ -24,6 +24,7 @@ public class Entrypoint implements CommandLineRunner {
 			if (args.length >= 1) {
 				switch (args[0]) {
 					case "git-bundle-all" -> gitBundleService.bundleAll();
+					case "git-dir-copy-all" -> gitDirCopyService.copyAll();
 					case "git-dir-copy" -> gitDirCopyService.copy(slice(args, 1));
 					case "sync", "s" -> scanShow.sync();
 					case "sync-all", "sa" -> scanShow.syncAll();
@@ -46,11 +47,12 @@ public class Entrypoint implements CommandLineRunner {
 	private String usage() {
 		return """
 				usage:
-					sync, s        - quick sync
-					sync-all, sa   - long sync all data
-					git-bundle-all - bundle all repos to another dir, no save timestamp
-					git-dir-copy   - copy .git from bundle to dir with replace
-									 1 - dir with .git
-									 2 - bundle path""";
+					sync, s          - quick sync
+					sync-all, sa     - long sync all data
+					git-bundle-all   - bundle all repos to another dir, no save timestamp
+					git-dir-copy     - copy .git from bundle to dir with replace
+									   1 - dir with .git
+									   2 - bundle path
+					git-dir-copy-all - execute git-dir-copy for work dir, auto find repos and bundles""";
 	}
 }

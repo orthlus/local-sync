@@ -26,6 +26,10 @@ public class GitDirCopyService {
 	private final Utils utils;
 	private static final String DOT_GIT = ".git";
 
+	public void copyAll() {
+
+	}
+
 	public void copy(String[] args) {
 		if (args.length != 2) {
 			log(wrapRed("Wrong number of arguments"));
