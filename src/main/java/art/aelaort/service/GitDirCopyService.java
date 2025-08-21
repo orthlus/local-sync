@@ -64,7 +64,7 @@ public class GitDirCopyService {
 
 		FileUtils.deleteQuietly(targetGit.toFile());
 		copyDirectory(targetProjectDir.resolve(DOT_GIT), bundleGitDirOp.get());
-
+		callGitAdd(tmp);
 
 		FileUtils.deleteQuietly(tmp.toFile());
 	}
@@ -89,6 +89,10 @@ public class GitDirCopyService {
 			return Optional.empty();
 		}
 		return Optional.of(gitDir);
+	}
+
+	private void callGitAdd(Path tmp) {
+		systemProcess.callProcessThrows(tmp, "git add .");
 	}
 
 	private Response extractBundle(Path bundlePath, Path tmp) {
