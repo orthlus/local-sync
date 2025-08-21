@@ -6,11 +6,11 @@ import art.aelaort.utils.Utils;
 import art.aelaort.utils.system.Response;
 import art.aelaort.utils.system.SystemProcess;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
@@ -27,7 +27,7 @@ public class GitDirCopyService {
 	private static final String DOT_GIT = ".git";
 
 	public void copyAll() {
-
+		// TODO обходить все папки в root.dir, искать репы, для каждой искать бандл в git.bundles.all-dir и вызывать copy()
 	}
 
 	public void copy(String[] args) {
@@ -67,18 +67,19 @@ public class GitDirCopyService {
 		}
 
 		FileUtils.deleteQuietly(targetGit.toFile());
-		copyDirectory(targetProjectDir.resolve(DOT_GIT), bundleGitDirOp.get());
-		callGitAdd(tmp);
+		copyDirectory(bundleGitDirOp.get(), targetProjectDir.resolve(DOT_GIT));
+		callGitAdd(targetProjectDir);
+		updateGitRemoteUrl(targetProjectDir, "");
 
 		FileUtils.deleteQuietly(tmp.toFile());
 	}
 
-	private static void copyDirectory(Path targetProjectDir, Path bundleGitDir) {
-		try {
-			FileUtils.copyDirectory(bundleGitDir.toFile(), targetProjectDir.toFile());
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+	private void updateGitRemoteUrl(Path tmp, String url) {
+		systemProcess.callProcessThrows(tmp, "git remote set-url origin " + url);
+	}
+
+	private void callGitAdd(Path tmp) {
+		systemProcess.callProcessThrows(tmp, "git add .");
 	}
 
 	private static Optional<Path> getGitDir(Path tmp, Path bundlePath) {
@@ -95,12 +96,13 @@ public class GitDirCopyService {
 		return Optional.of(gitDir);
 	}
 
-	private void callGitAdd(Path tmp) {
-		systemProcess.callProcessThrows(tmp, "git add .");
-	}
-
 	private Response extractBundle(Path bundlePath, Path tmp) {
 		return systemProcess.callProcess(tmp, "git clone --no-checkout " + bundlePath.toString());
+	}
+
+	@SneakyThrows
+	private static void copyDirectory(Path bundleGitDir, Path targetProjectDir) {
+		FileUtils.copyDirectory(bundleGitDir.toFile(), targetProjectDir.toFile());
 	}
 
 	private static void checkParams(Path gitDir, Path bundlePath) {
