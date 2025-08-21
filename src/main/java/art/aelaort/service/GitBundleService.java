@@ -19,6 +19,7 @@ import java.util.stream.Stream;
 
 import static art.aelaort.utils.ColoredConsoleTextUtils.wrapGreen;
 import static art.aelaort.utils.ColoredConsoleTextUtils.wrapRed;
+import static art.aelaort.utils.GitUtils.*;
 import static art.aelaort.utils.Utils.log;
 
 @SuppressWarnings("FieldCanBeLocal")
@@ -156,22 +157,11 @@ public class GitBundleService {
 	}
 
 	@SneakyThrows
-	private static void mkdir(Path bundlesDir) {
-		if (Files.notExists(bundlesDir)) {
-			Files.createDirectory(bundlesDir);
-		}
-	}
-
-	@SneakyThrows
 	private LocalDateTime getLastSyncTime() {
 		if (Files.exists(lastSyncFile)) {
 			return parseGitDate(Files.readString(lastSyncFile).trim());
 		} else {
 			return LocalDateTime.now();
 		}
-	}
-
-	private LocalDateTime parseGitDate(String date) {
-		return LocalDateTime.ofInstant(Instant.ofEpochSecond(Long.parseLong(date)), TimeZone.getDefault().toZoneId());
 	}
 }

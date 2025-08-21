@@ -6,8 +6,6 @@ import art.aelaort.utils.Utils;
 import art.aelaort.utils.system.Response;
 import art.aelaort.utils.system.SystemProcess;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Component;
 
@@ -17,6 +15,8 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 import static art.aelaort.utils.ColoredConsoleTextUtils.wrapRed;
+import static art.aelaort.utils.GitUtils.copyDirectory;
+import static art.aelaort.utils.GitUtils.deleteDir;
 import static art.aelaort.utils.Utils.log;
 
 @Component
@@ -66,12 +66,12 @@ public class GitDirCopyService {
 			throw new AppExitErrorException();
 		}
 
-		FileUtils.deleteQuietly(targetGit.toFile());
+		deleteDir(targetGit);
 		copyDirectory(bundleGitDirOp.get(), targetProjectDir.resolve(DOT_GIT));
 		callGitAdd(targetProjectDir);
 		updateGitRemoteUrl(targetProjectDir, "");
 
-		FileUtils.deleteQuietly(tmp.toFile());
+		deleteDir(tmp);
 	}
 
 	private void updateGitRemoteUrl(Path tmp, String url) {
@@ -98,11 +98,6 @@ public class GitDirCopyService {
 
 	private Response extractBundle(Path bundlePath, Path tmp) {
 		return systemProcess.callProcess(tmp, "git clone --no-checkout " + bundlePath.toString());
-	}
-
-	@SneakyThrows
-	private static void copyDirectory(Path bundleGitDir, Path targetProjectDir) {
-		FileUtils.copyDirectory(bundleGitDir.toFile(), targetProjectDir.toFile());
 	}
 
 	private static void checkParams(Path gitDir, Path bundlePath) {
