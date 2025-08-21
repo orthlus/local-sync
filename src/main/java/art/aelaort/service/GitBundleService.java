@@ -54,7 +54,7 @@ public class GitBundleService {
 
 		List<Path> gitRepos = getGitReposAll();
 
-		makeBundles(gitRepos, tmp);
+		makeBundles(gitRepos, tmp, true);
 //		makeBundles(gitRepos, allBundlesDir);
 
 		deleteDir(allBundlesDir);
@@ -69,7 +69,7 @@ public class GitBundleService {
 		List<Path> gitRepos = getGitRepos();
 		Set<String> currentBundles = getCurrentBundles();
 		gitRepos = filterGitRepos(gitRepos, currentBundles);
-		makeBundles(gitRepos, bundlesDir);
+		makeBundles(gitRepos, bundlesDir, false);
 		saveTimestamp();
 		log(wrapGreen("git bundles created"));
 	}
@@ -87,7 +87,7 @@ public class GitBundleService {
 		}
 	}
 
-	private void makeBundles(List<Path> gitRepos, Path bundlesDir) {
+	private void makeBundles(List<Path> gitRepos, Path bundlesDir, boolean log) {
 		mkdir(bundlesDir);
 		Map<String, String> gitRemotesByBundleName = new HashMap<>();
 
@@ -102,6 +102,9 @@ public class GitBundleService {
 
 			Response gitRemoteResp = systemProcess.callProcessThrows(gitRepo, gitGetRemoteUrlCommand);
 			gitRemotesByBundleName.put(bundleName, gitRemoteResp.stdout().strip());
+			if (log) {
+				log(wrapGreen("bundle %s created".formatted(bundleName)));
+			}
 		}
 
 		saveRemotesMap(gitRemotesByBundleName);
