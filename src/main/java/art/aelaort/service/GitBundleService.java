@@ -52,7 +52,7 @@ public class GitBundleService {
 	public void bundleAll() {
 		Path tmp = utils.createTmpDir();
 
-		List<Path> gitRepos = getGitReposAll();
+		List<Path> gitRepos = getGitReposAll(rootDir, 6);
 
 		makeBundles(gitRepos, tmp, true);
 //		makeBundles(gitRepos, allBundlesDir);
@@ -135,18 +135,6 @@ public class GitBundleService {
 		return filteredGitRepos;
 	}
 
-	private List<Path> getGitReposAll() {
-		try (Stream<Path> walk = Files.walk(rootDir, 6)) {
-			return walk
-					.filter(Files::isDirectory)
-					.filter(path -> path.resolve(".git").toFile().exists())
-					.toList();
-		} catch (IOException e) {
-			log(wrapRed("Error getting git repositories"));
-			return List.of();
-		}
-	}
-
 	private List<Path> getGitRepos() {
 		try (Stream<Path> walk = Files.walk(rootDir, 6)) {
 			return walk
@@ -159,11 +147,6 @@ public class GitBundleService {
 			log(wrapRed("Error getting git repositories"));
 			return List.of();
 		}
-	}
-
-	private String bundleName(Path gitRepo) {
-		String parent = gitRepo.getParent().getFileName().toString().replace(" ", "-");
-		return "%s--%s.bundle".formatted(parent, gitRepo.getFileName());
 	}
 
 	@SneakyThrows
