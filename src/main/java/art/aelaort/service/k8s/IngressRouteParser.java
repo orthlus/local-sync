@@ -9,11 +9,13 @@ import io.fabric8.kubernetes.api.model.HasMetadata;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+
+import static art.aelaort.utils.ColoredConsoleTextUtils.wrapRed;
+import static art.aelaort.utils.Utils.log;
 
 @Component
 @RequiredArgsConstructor
@@ -21,12 +23,20 @@ public class IngressRouteParser {
 	private final YAMLMapper yamlMapper;
 
 	public Map<String, K8sIngressRoute> getMapRoutesByServiceName(List<HasMetadata> k8sObjects) {
-		return getIngressRoutes(k8sObjects)
-				.stream()
-				.collect(Collectors.toMap(
-						K8sIngressRoute::getServiceName,
-						Function.identity()
-				));
+		Map<String, K8sIngressRoute> result = new HashMap<>();
+
+		for (K8sIngressRoute ir : getIngressRoutes(k8sObjects)) {
+			if (result.containsKey(ir.getServiceName())) {
+				K8sIngressRoute routeInResult = result.get(ir.getServiceName());
+				if (!routeInResult.getMatch().equals(ir.getMatch())) {
+					log(wrapRed("service %s has multi routes: %s, %s".formatted(ir.getServiceName(), ir.getMatch(), routeInResult)));
+				}
+			} else {
+				result.put(ir.getServiceName(), ir);
+			}
+		}
+
+		return result;
 	}
 
 	public List<K8sIngressRoute> getIngressRoutes(List<HasMetadata> k8sObjects) {
