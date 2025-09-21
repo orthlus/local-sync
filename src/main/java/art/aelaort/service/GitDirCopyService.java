@@ -14,15 +14,19 @@ import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static art.aelaort.utils.ColoredConsoleTextUtils.wrapRed;
-import static art.aelaort.utils.GitUtils.copyDirectory;
-import static art.aelaort.utils.GitUtils.deleteDir;
+import static art.aelaort.utils.GitUtils.*;
 import static art.aelaort.utils.Utils.log;
 
 @Component
@@ -33,6 +37,11 @@ public class GitDirCopyService {
 	private final ObjectMapper prettyObjectMapper;
 	@Value("${git.bundles.remotes-urls-by-bundle-file}")
 	private Path remotesUrlsByBundleFile;
+	@Value("${root.dir}")
+	private Path rootDir;
+	@Value("${git.bundles.all-dir}")
+	private Path allBundlesDir;
+
 	private Map<String, String> remoteUrls;
 	private static final String DOT_GIT = ".git";
 
@@ -43,6 +52,20 @@ public class GitDirCopyService {
 
 	public void copyAll() {
 		// TODO обходить все папки в root.dir, искать репы, для каждой искать бандл в git.bundles.all-dir и вызывать copy()
+		Set<String> bundles = searchAllBundles();
+		List<Path> reposAll = getGitReposAll(rootDir, 6);
+	}
+
+	private Set<String> searchAllBundles() {
+		try (Stream<Path> list = Files.list(allBundlesDir)) {
+			return list
+					.map(p -> p.getFileName().toString())
+					.filter(f -> f.endsWith(".bundle"))
+					.collect(Collectors.toSet());
+		} catch (IOException e) {
+			log(wrapRed("error reading all bundles directory"));
+			throw new AppExitErrorException();
+		}
 	}
 
 	public void copy(String[] args) {
