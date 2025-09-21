@@ -1,0 +1,19 @@
+# test-1
+Host s1
+    HostName 192.168.1.3
+    User root
+    Port 21864
+    IdentityFile test-1.pub
+
+# test-2
+Host s2
+    HostName 192.168.1.2
+    User nonroot
+    Port 22
+    IdentityFile /opt/test-2.pub
+
+# tttttt
+Host vm1
+    HostName 192.168.56.1
+    User root
+    Port 2221
