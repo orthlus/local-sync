@@ -1,10 +1,8 @@
 package art.aelaort.service.mappers;
 
 import art.aelaort.models.servers.DirServer;
-import art.aelaort.models.servers.Server;
 import art.aelaort.models.servers.TabbyServer;
-import art.aelaort.models.ssh.SshServer;
-import org.springframework.beans.factory.annotation.Value;
+import art.aelaort.models.servers.ssh.SshServer;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -20,5 +18,9 @@ public class ServerMapper {
 
 	public Map<String, TabbyServer> toMapTabby(List<TabbyServer> tabbyServers) {
 		return tabbyServers.stream().collect(Collectors.toMap(TabbyServer::name, Function.identity()));
+	}
+
+	public Map<String, SshServer> toMapSshServer(List<? extends SshServer> sshServers) {
+		return sshServers.stream().collect(Collectors.toMap(SshServer::name, Function.identity()));
 	}
 }

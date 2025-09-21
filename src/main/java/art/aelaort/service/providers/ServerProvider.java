@@ -2,7 +2,8 @@ package art.aelaort.service.providers;
 
 import art.aelaort.models.servers.DirServer;
 import art.aelaort.models.servers.Server;
-import art.aelaort.models.servers.TabbyServer;
+import art.aelaort.models.servers.ssh.SshConfigServer;
+import art.aelaort.models.servers.ssh.SshServer;
 import art.aelaort.service.mappers.ServerMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -17,26 +18,26 @@ import java.util.stream.Collectors;
 public class ServerProvider {
 	private final ServerMapper serverMapper;
 	private final DirServerProvider dirServerProvider;
-	private final TabbyServerProvider tabbyServerProvider;
+	private final SshConfigServerProvider sshConfigServerProvider;
 
 	public List<Server> scanAndJoinData(Map<String, String> mapNodesByClusterName) {
 		List<DirServer> dirServers = dirServerProvider.scanServersDir();
-		List<TabbyServer> tabbyServers = tabbyServerProvider.readLocalInner();
-		return joinDirAndTabbyServers(dirServers, tabbyServers, mapNodesByClusterName);
+		List<SshConfigServer> sshConfigServers = sshConfigServerProvider.readLocal();
+		return joinDirAndSshServers(dirServers, sshConfigServers, mapNodesByClusterName);
 	}
 
-	private List<Server> joinDirAndTabbyServers(List<DirServer> dirServers, List<TabbyServer> tabbyServers, Map<String, String> mapNodesByClusterName) {
+	private List<Server> joinDirAndSshServers(List<DirServer> dirServers, List<? extends SshServer> sshServers, Map<String, String> mapNodesByClusterName) {
 		Map<String, DirServer> dirServersByName = serverMapper.toMapServers(dirServers);
-		List<Server> result = new ArrayList<>(tabbyServers.size());
+		List<Server> result = new ArrayList<>(sshServers.size());
 
-		for (TabbyServer tabbyServer : tabbyServers) {
+		for (SshServer sshServer : sshServers) {
 			Server.ServerBuilder serverBuilder = Server.builder()
-					.name(tabbyServer.name())
-					.ip(tabbyServer.host())
-					.port(tabbyServer.port())
-					.sshKey(tabbyServer.keyPath().replace("\\", "/"));
+					.name(sshServer.name())
+					.ip(sshServer.host())
+					.port(sshServer.port())
+					.sshKey(sshServer.keyPath().replace("\\", "/"));
 
-			DirServer dirServer = dirServersByName.get(tabbyServer.name());
+			DirServer dirServer = dirServersByName.get(sshServer.name());
 			if (dirServer == null) {
 				serverBuilder
 						.monitoring(false)
@@ -50,9 +51,9 @@ public class ServerProvider {
 			result.add(serverBuilder.build());
 		}
 
-		Map<String, TabbyServer> tabbyServersByName = serverMapper.toMapTabby(tabbyServers);
+		Map<String, SshServer> sshServersByName = serverMapper.toMapSshServer(sshServers);
 		for (DirServer dirServer : dirServers) {
-			if (!tabbyServersByName.containsKey(dirServer.name())) {
+			if (!sshServersByName.containsKey(dirServer.name())) {
 				Server server = Server.builder()
 						.name(dirServer.name())
 						.monitoring(dirServer.monitoring())
