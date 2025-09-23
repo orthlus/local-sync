@@ -1,5 +1,6 @@
 package art.aelaort.service.mappers;
 
+import art.aelaort.exceptions.SshNameNotFoundException;
 import art.aelaort.models.servers.ssh.SshConfigServer;
 import org.apache.sshd.client.config.hosts.HostConfigEntry;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,7 +22,7 @@ public class SshConfigServerMapper {
 						key = e.getIdentities().iterator().next();
 					}
 					return new SshConfigServer(
-							serverNamesByHost.getOrDefault(e.getHost(), e.getHost()),
+							getNameByHost(e.getHost(), serverNamesByHost),
 							e.getHostName(),
 							key
 									.replace(sshCommonConfigKeyFilePrefix, "")
@@ -30,5 +31,13 @@ public class SshConfigServerMapper {
 					);
 				})
 				.toList();
+	}
+
+	private String getNameByHost(String host, Map<String, String> serverNamesByHost) {
+		String string = serverNamesByHost.get(host);
+		if (string == null) {
+			throw new SshNameNotFoundException();
+		}
+		return string;
 	}
 }
