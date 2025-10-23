@@ -77,7 +77,12 @@ public class K8sClusterProvider {
 
 	private List<String> readNodes(Path cluster) {
 		try {
-			return Files.readAllLines(cluster.resolve(k8sProps.getNodesFile()));
+			Path file = cluster.resolve(k8sProps.getNodesFile());
+			if (Files.exists(file)) {
+				return Files.readAllLines(file);
+			}
+
+			return List.of();
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
