@@ -19,7 +19,11 @@ public class K8sRowMapper {
 	public List<K8sIngressRouteRow> mapToIngressRouteRows(List<K8sCluster> clusters) {
 		List<K8sIngressRouteRow> res = new ArrayList<>();
 		for (K8sCluster cluster : clusters) {
-			for (K8sIngressRoute ingressRoute : cluster.ingressRoutes()) {
+			List<K8sIngressRoute> distinctRoutes = cluster.ingressRoutes()
+					.stream()
+					.distinct()
+					.toList();
+			for (K8sIngressRoute ingressRoute : distinctRoutes) {
 				K8sIngressRouteRow k8sIngressRouteRow = new K8sIngressRouteRow(
 						cluster.name(),
 						ingressRoute.getNamespace(),

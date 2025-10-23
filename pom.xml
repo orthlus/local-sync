@@ -42,7 +42,7 @@
         <dependency>
             <groupId>art.aelaort</groupId>
             <artifactId>ae-sync-models</artifactId>
-            <version>7.3</version>
+            <version>7.4</version>
         </dependency>
 
         <dependency>
