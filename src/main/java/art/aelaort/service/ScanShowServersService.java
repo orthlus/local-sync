@@ -36,7 +36,7 @@ public class ScanShowServersService {
 		outputJsonService.saveApps(servers);
 		outputJsonService.saveServers(servers);
 		outputJsonService.saveK8sApps(clusters);
-		outputJsonService.saveK8sCronJobs(clusters);
+		outputJsonService.saveIngressRoutes(clusters);
 
 //		tabbyServerProvider.copyToRepo();
 		log(wrapGreen("servers and apps sync finished"));

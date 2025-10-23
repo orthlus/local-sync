@@ -3,9 +3,9 @@ package art.aelaort.service;
 import art.aelaort.models.servers.Server;
 import art.aelaort.models.servers.display.AppRow;
 import art.aelaort.models.servers.display.K8sAppRow;
-import art.aelaort.models.servers.display.K8sCronJobRow;
 import art.aelaort.models.servers.display.ServerRow;
 import art.aelaort.models.servers.k8s.K8sCluster;
+import art.aelaort.models.servers.k8s.K8sIngressRoute;
 import art.aelaort.service.output.mapper.AppRowMapper;
 import art.aelaort.service.output.mapper.K8sRowMapper;
 import art.aelaort.service.output.mapper.ServerRowMapper;
@@ -31,8 +31,8 @@ public class OutputJsonService {
 	private final RestTemplate serversUiRestTemplate;
 	@Value("${servers.output.cluster-app-rows-file}")
 	private Path clusterAppRowsFile;
-	@Value("${servers.output.cronjobs-rows-file}")
-	private Path cronjobsAppRowsFile;
+	@Value("${servers.output.ingress-routes-file}")
+	private Path ingressRoutesFile;
 	@Value("${servers.output.app-rows-file}")
 	private Path appRowsFile;
 	@Value("${servers.output.servers-rows-file}")
@@ -42,7 +42,7 @@ public class OutputJsonService {
 		List<ServerRow> serverRows = serverRowMapper.mapToServerRow(servers);
 
 		String jsonStr = writeJson(serverRows);
-		save(serversRowsFile, "/servers-rows.json", jsonStr);
+		save(serversRowsFile, "/" + serversRowsFile.getFileName().toString(), jsonStr);
 	}
 
 	public void saveApps(List<Server> servers) {
@@ -50,7 +50,7 @@ public class OutputJsonService {
 		appRows = AppRow.addNumbers(appRows);
 
 		String jsonStr = writeJson(appRows);
-		save(appRowsFile, "/app-rows.json", jsonStr);
+		save(appRowsFile, "/" + appRowsFile.getFileName().toString(), jsonStr);
 	}
 
 	public void saveK8sApps(List<K8sCluster> clusters) {
@@ -58,15 +58,17 @@ public class OutputJsonService {
 		k8sAppRows = K8sAppRow.addNumbers(k8sAppRows);
 
 		String jsonStr = writeJson(k8sAppRows);
-		save(clusterAppRowsFile, "/cluster-app-rows.json", jsonStr);
+		save(clusterAppRowsFile, "/" + clusterAppRowsFile.getFileName().toString(), jsonStr);
 	}
 
-	public void saveK8sCronJobs(List<K8sCluster> clusters) {
-		List<K8sCronJobRow> k8sCronJobRows = k8sRowMapper.mapToCronJobRows(clusters);
-		k8sCronJobRows = K8sCronJobRow.addNumbers(k8sCronJobRows);
+	public void saveIngressRoutes(List<K8sCluster> clusters) {
+		List<K8sIngressRoute> ingressRoutes = clusters.stream()
+				.map(K8sCluster::ingressRoutes)
+				.flatMap(List::stream)
+				.toList();
 
-		String jsonStr = writeJson(k8sCronJobRows);
-		save(cronjobsAppRowsFile, "/cronjobs-app-rows.json", jsonStr);
+		String jsonStr = writeJson(ingressRoutes);
+		save(ingressRoutesFile, "/" + ingressRoutesFile.getFileName().toString(), jsonStr);
 	}
 
 	private String writeJson(List<?> rows) {
