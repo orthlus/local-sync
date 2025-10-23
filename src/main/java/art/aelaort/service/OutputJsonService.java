@@ -42,7 +42,7 @@ public class OutputJsonService {
 		List<ServerRow> serverRows = serverRowMapper.mapToServerRow(servers);
 
 		String jsonStr = writeJson(serverRows);
-		save(serversRowsFile, "/" + serversRowsFile.getFileName().toString(), jsonStr);
+		save(serversRowsFile, jsonStr);
 	}
 
 	public void saveApps(List<Server> servers) {
@@ -50,7 +50,7 @@ public class OutputJsonService {
 		appRows = AppRow.addNumbers(appRows);
 
 		String jsonStr = writeJson(appRows);
-		save(appRowsFile, "/" + appRowsFile.getFileName().toString(), jsonStr);
+		save(appRowsFile, jsonStr);
 	}
 
 	public void saveK8sApps(List<K8sCluster> clusters) {
@@ -58,7 +58,7 @@ public class OutputJsonService {
 		k8sAppRows = K8sAppRow.addNumbers(k8sAppRows);
 
 		String jsonStr = writeJson(k8sAppRows);
-		save(clusterAppRowsFile, "/" + clusterAppRowsFile.getFileName().toString(), jsonStr);
+		save(clusterAppRowsFile, jsonStr);
 	}
 
 	public void saveIngressRoutes(List<K8sCluster> clusters) {
@@ -68,7 +68,7 @@ public class OutputJsonService {
 				.toList();
 
 		String jsonStr = writeJson(ingressRoutes);
-		save(ingressRoutesFile, "/" + ingressRoutesFile.getFileName().toString(), jsonStr);
+		save(ingressRoutesFile, jsonStr);
 	}
 
 	private String writeJson(List<?> rows) {
@@ -79,10 +79,10 @@ public class OutputJsonService {
 		}
 	}
 
-	private void save(Path file, String url, String jsonStr) {
+	private void save(Path file, String jsonStr) {
 		try {
 			Files.writeString(file, jsonStr);
-			serversUiRestTemplate.put(url, jsonStr);
+			serversUiRestTemplate.put("/" + file.getFileName().toString(), jsonStr);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
