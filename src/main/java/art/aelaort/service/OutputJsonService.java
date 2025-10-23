@@ -3,9 +3,9 @@ package art.aelaort.service;
 import art.aelaort.models.servers.Server;
 import art.aelaort.models.servers.display.AppRow;
 import art.aelaort.models.servers.display.K8sAppRow;
+import art.aelaort.models.servers.display.K8sIngressRouteRow;
 import art.aelaort.models.servers.display.ServerRow;
 import art.aelaort.models.servers.k8s.K8sCluster;
-import art.aelaort.models.servers.k8s.K8sIngressRoute;
 import art.aelaort.service.output.mapper.AppRowMapper;
 import art.aelaort.service.output.mapper.K8sRowMapper;
 import art.aelaort.service.output.mapper.ServerRowMapper;
@@ -62,12 +62,9 @@ public class OutputJsonService {
 	}
 
 	public void saveIngressRoutes(List<K8sCluster> clusters) {
-		List<K8sIngressRoute> ingressRoutes = clusters.stream()
-				.map(K8sCluster::ingressRoutes)
-				.flatMap(List::stream)
-				.toList();
+		List<K8sIngressRouteRow> k8sIngressRouteRows = k8sRowMapper.mapToIngressRouteRows(clusters);
 
-		String jsonStr = writeJson(ingressRoutes);
+		String jsonStr = writeJson(k8sIngressRouteRows);
 		save(ingressRoutesFile, jsonStr);
 	}
 

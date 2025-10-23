@@ -62,4 +62,20 @@ public class Utils {
 				.replace(dockerImagePattern1, dockerImagePattern1Replacement)
 				.replace(dockerImagePattern2, dockerImagePattern2Replacement);
 	}
+
+	public static String cleanK8sRouteMatchIfPossible(String routeMatch) {
+		if (routeMatch.matches("Host\\(`[\\w.-]+`\\)")) {
+			return routeMatch.substring(6, routeMatch.length() - 2);
+		} else if (clean(routeMatch).matches("Host\\(`[\\w.-]+`\\)&&PathPrefix\\(`[/\\w.-]+`\\)")) {
+			String[] split = clean(routeMatch).split("&&");
+			String host = split[0];
+			String path = split[1];
+			return host.substring(6, host.length() - 2) + path.substring(12, path.length() - 2);
+		}
+		return routeMatch;
+	}
+
+	private static String clean(String routeMatch) {
+		return routeMatch.replace(" ", "");
+	}
 }

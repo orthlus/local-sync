@@ -2,10 +2,9 @@ package art.aelaort.service.output.mapper;
 
 import art.aelaort.models.servers.display.K8sAppRow;
 import art.aelaort.models.servers.display.K8sCronJobRow;
-import art.aelaort.models.servers.k8s.K8sApp;
-import art.aelaort.models.servers.k8s.K8sCluster;
-import art.aelaort.models.servers.k8s.K8sHelmChart;
-import art.aelaort.models.servers.k8s.K8sService;
+import art.aelaort.models.servers.display.K8sIngressRouteRow;
+import art.aelaort.models.servers.k8s.*;
+import art.aelaort.utils.Utils;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -17,6 +16,22 @@ import static org.springframework.util.StringUtils.hasText;
 
 @Component
 public class K8sRowMapper {
+	public List<K8sIngressRouteRow> mapToIngressRouteRows(List<K8sCluster> clusters) {
+		List<K8sIngressRouteRow> res = new ArrayList<>();
+		for (K8sCluster cluster : clusters) {
+			for (K8sIngressRoute ingressRoute : cluster.ingressRoutes()) {
+				K8sIngressRouteRow k8sIngressRouteRow = new K8sIngressRouteRow(
+						cluster.name(),
+						ingressRoute.getNamespace(),
+						ingressRoute.getName(),
+						(ingressRoute.isHasTls() ? "https://" : "http://") + Utils.cleanK8sRouteMatchIfPossible(ingressRoute.getMatch())
+				);
+				res.add(k8sIngressRouteRow);
+			}
+		}
+		return res;
+	}
+
 	public List<K8sCronJobRow> mapToCronJobRows(List<K8sCluster> clusters) {
 		List<K8sCronJobRow> res = new ArrayList<>();
 		for (K8sCluster cluster : clusters) {

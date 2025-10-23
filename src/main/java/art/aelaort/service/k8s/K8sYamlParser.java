@@ -61,7 +61,7 @@ public class K8sYamlParser {
 		for (K8sService k8sService : result) {
 			K8sIngressRoute ingressRouteSpec = mapRoutesByServiceName.get(k8sService.getName());
 			if (ingressRouteSpec != null) {
-				String routeMatch = cleanRouteMatchIfPossible(ingressRouteSpec.getMatch());
+				String routeMatch = Utils.cleanK8sRouteMatchIfPossible(ingressRouteSpec.getMatch());
 				K8sService e = k8sService.withRoute(routeMatch);
 				newResult.add(e);
 			} else {
@@ -70,22 +70,6 @@ public class K8sYamlParser {
 		}
 
 		return newResult;
-	}
-
-	private String cleanRouteMatchIfPossible(String routeMatch) {
-		if (routeMatch.matches("Host\\(`[\\w.-]+`\\)")) {
-			return routeMatch.substring(6, routeMatch.length() - 2);
-		} else if (clean(routeMatch).matches("Host\\(`[\\w.-]+`\\)&&PathPrefix\\(`[/\\w.-]+`\\)")) {
-			String[] split = clean(routeMatch).split("&&");
-			String host = split[0];
-			String path = split[1];
-			return host.substring(6, host.length() - 2) + path.substring(12, path.length() - 2);
-		}
-		return routeMatch;
-	}
-
-	private String clean(String routeMatch) {
-		return routeMatch.replace(" ", "");
 	}
 
 	private K8sService convert(Service service) {
