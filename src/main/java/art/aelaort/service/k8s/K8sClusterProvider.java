@@ -39,9 +39,7 @@ public class K8sClusterProvider {
 		List<K8sCluster> result = new ArrayList<>();
 
 		for (Path clustersDir : getClustersDirs()) {
-			Path dir = clustersDir.resolve(k8sProps.getPathFiles());
-
-			List<HasMetadata> hasMetadataList = getYamlFiles(dir).stream()
+			List<HasMetadata> hasMetadataList = getYamlFiles(clustersDir).stream()
 					.map(k8sYamlParser::parse)
 					.flatMap(Collection::stream)
 					.toList();
@@ -86,7 +84,11 @@ public class K8sClusterProvider {
 	}
 
 	private List<Path> getYamlFiles(Path dir) {
-		try (Stream<Path> walk = Files.walk(dir)) {
+		Path root = dir;
+		if (Files.exists(dir.resolve(k8sProps.getPathFiles()))) {
+			root = dir.resolve(k8sProps.getPathFiles());
+		}
+		try (Stream<Path> walk = Files.walk(root)) {
 			return walk
 					.filter(path -> {
 						String lowerCase = path.getFileName().toString().toLowerCase();
@@ -99,15 +101,22 @@ public class K8sClusterProvider {
 	}
 
 	private List<Path> getClustersDirs() {
+		List<Path> res = new ArrayList<>();
 		try (Stream<Path> walk = Files.walk(k8sProps.getDir(), 1)) {
-			return walk
+			List<Path> list = walk
 					.filter(path -> !path.equals(k8sProps.getDir()))
 					.filter(path -> path.toFile().isDirectory())
 					.filter(path -> !path.resolve(notScanFile).toFile().exists())
 					.filter(path -> path.resolve(k8sProps.getPathFiles()).toFile().exists())
 					.toList();
+			res.addAll(list);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+
+		res.add(k8sProps.getDir2());
+		res.add(k8sProps.getDir3());
+
+		return res;
 	}
 }
