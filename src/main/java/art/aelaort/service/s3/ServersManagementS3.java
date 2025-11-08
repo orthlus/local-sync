@@ -16,6 +16,16 @@ public class ServersManagementS3 {
 	private final S3Params serversManagementS3Params;
 	private final S3Properties s3Properties;
 
+	public void uploadBookmarks(String key, String bookmarksCsv) {
+		try (S3Client client = client(serversManagementS3Params)) {
+			RequestBody requestBody = RequestBody.fromString(bookmarksCsv);
+			client.putObject(PutObjectRequest.builder()
+					.bucket(s3Properties.getServersManagement().getBucket())
+					.key(key)
+					.build(), requestBody);
+		}
+	}
+
 	public void uploadIps(String ipsText) {
 		try (S3Client client = client(serversManagementS3Params)) {
 			RequestBody requestBody = RequestBody.fromString(ipsText);
