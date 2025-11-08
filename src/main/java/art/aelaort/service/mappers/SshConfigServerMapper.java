@@ -10,7 +10,7 @@ import org.springframework.util.StringUtils;
 import java.util.List;
 import java.util.Map;
 
-import static art.aelaort.utils.ColoredConsoleTextUtils.wrapGreen;
+import static art.aelaort.utils.ColoredConsoleTextUtils.wrapRed;
 import static art.aelaort.utils.Utils.log;
 
 @Component
@@ -41,7 +41,7 @@ public class SshConfigServerMapper {
 		String string = serverNamesByHost.get(e.getHost());
 		if (string == null) {
 			if (StringUtils.hasText(e.getProxyJump())) {
-				log(wrapGreen("ssh конфиг - %s не имеет полного имени".formatted(e.getHost())));
+				log(wrapRed("ssh конфиг - %s не имеет полного имени".formatted(e.getHost())));
 				return e.getHost();
 			}
 
