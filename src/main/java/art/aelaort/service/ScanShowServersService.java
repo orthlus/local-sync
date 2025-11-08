@@ -28,8 +28,7 @@ public class ScanShowServersService {
 	public void sync() {
 		List<K8sCluster> clusters = k8sClusterProvider.getClusters();
 
-		Map<String, String> mapNodesByClusterName = k8sClusterProvider.getMapClusterNameByNode(clusters);
-		List<Server> servers = serverProvider.scanAndJoinData(mapNodesByClusterName);
+		List<Server> servers = serverProvider.scanAndJoinData();
 
 		serversManagementService.saveData(servers, clusters);
 		serversManagementService.saveIps(servers);

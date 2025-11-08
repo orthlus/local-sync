@@ -25,14 +25,14 @@ public class K8sClusterProvider {
 	@Value("${servers.management.files.not_scan}")
 	private String notScanFile;
 
-	public Map<String, String> getMapClusterNameByNode(List<K8sCluster> clusters) {
-		Map<String, String> res = new HashMap<>();
-		for (K8sCluster cluster : clusters) {
-			for (String node : cluster.nodes()) {
-				res.put(node, cluster.name());
+	public Map<String, String> getMapClusterNameByNode() {
+		Map<String, String> result = new HashMap<>();
+		for (Path clustersDir : getClustersDirs()) {
+			for (String node : readNodes(clustersDir)) {
+				result.put(node, clustersDir.getFileName().toString());
 			}
 		}
-		return res;
+		return result;
 	}
 
 	public List<K8sCluster> getClusters() {
@@ -105,6 +105,10 @@ public class K8sClusterProvider {
 		}
 	}
 
+	private List<Path> getClustersArgocdDirs() {
+		return Arrays.asList(k8sProps.getArgoDirs());
+	}
+
 	private List<Path> getClustersDirs() {
 		List<Path> res = new ArrayList<>();
 		try (Stream<Path> walk = Files.walk(k8sProps.getDir(), 1)) {
@@ -118,8 +122,6 @@ public class K8sClusterProvider {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-
-		res.addAll(Arrays.asList(k8sProps.getArgoDirs()));
 
 		return res;
 	}

@@ -4,6 +4,7 @@ import art.aelaort.models.servers.DirServer;
 import art.aelaort.models.servers.Server;
 import art.aelaort.models.servers.ssh.SshConfigServer;
 import art.aelaort.models.servers.ssh.SshServer;
+import art.aelaort.service.k8s.K8sClusterProvider;
 import art.aelaort.service.mappers.ServerMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -19,10 +20,12 @@ public class ServerProvider {
 	private final ServerMapper serverMapper;
 	private final DirServerProvider dirServerProvider;
 	private final SshConfigServerProvider sshConfigServerProvider;
+	private final K8sClusterProvider k8sClusterProvider;
 
-	public List<Server> scanAndJoinData(Map<String, String> mapNodesByClusterName) {
+	public List<Server> scanAndJoinData() {
 		List<DirServer> dirServers = dirServerProvider.scanServersDir();
 		List<SshConfigServer> sshConfigServers = sshConfigServerProvider.readLocal();
+		Map<String, String> mapNodesByClusterName = k8sClusterProvider.getMapClusterNameByNode();
 		return joinDirAndSshServers(dirServers, sshConfigServers, mapNodesByClusterName);
 	}
 
