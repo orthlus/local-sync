@@ -115,6 +115,9 @@ public class K8sRowMapper {
 		for (K8sApp app : cluster.apps()) {
 			if (hasText(app.getPodName())) {
 				for (K8sService service : cluster.services()) {
+					if (service.getAppSelector() == null) {
+						continue;
+					}
 					if (service.getAppSelector().equals(app.getPodName()) && service.getNamespace().equals(app.getNamespace())) {
 						res.put(app.getPodName(), service);
 					}
