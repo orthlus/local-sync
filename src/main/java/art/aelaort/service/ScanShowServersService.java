@@ -37,7 +37,6 @@ public class ScanShowServersService {
 		outputJsonService.saveApps(servers);
 		outputJsonService.saveServers(servers);
 		outputJsonService.saveK8sApps(clusters);
-		outputJsonService.saveIngressRoutes(clusters);
 		bookmarksService.saveBookmarks(clusters);
 
 //		tabbyServerProvider.copyToRepo();

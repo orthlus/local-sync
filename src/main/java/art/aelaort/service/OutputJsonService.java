@@ -31,8 +31,6 @@ public class OutputJsonService {
 	private final RestTemplate serversUiRestTemplate;
 	@Value("${servers.output.cluster-app-rows-file}")
 	private Path clusterAppRowsFile;
-	@Value("${servers.output.ingress-routes-file}")
-	private Path ingressRoutesFile;
 	@Value("${servers.output.app-rows-file}")
 	private Path appRowsFile;
 	@Value("${servers.output.servers-rows-file}")
@@ -59,13 +57,6 @@ public class OutputJsonService {
 
 		String jsonStr = writeJson(k8sAppRows);
 		save(clusterAppRowsFile, jsonStr);
-	}
-
-	public void saveIngressRoutes(List<K8sCluster> clusters) {
-		List<K8sIngressRouteRow> k8sIngressRouteRows = k8sRowMapper.mapToIngressRouteRows(clusters);
-
-		String jsonStr = writeJson(k8sIngressRouteRows);
-		save(ingressRoutesFile, jsonStr);
 	}
 
 	private String writeJson(List<?> rows) {
