@@ -119,8 +119,7 @@ public class K8sClusterProvider {
 			throw new RuntimeException(e);
 		}
 
-		res.add(k8sProps.getDir2());
-		res.add(k8sProps.getDir3());
+		res.addAll(Arrays.asList(k8sProps.getArgoDirs()));
 
 		return res;
 	}

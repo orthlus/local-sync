@@ -13,8 +13,7 @@ import java.nio.file.Path;
 @Setter
 public class K8sProps {
 	private Path dir;
-	private Path dir2;
-	private Path dir3;
+	private Path[] argoDirs;
 	private Path defaultFile;
 	private String pathFiles;
 	private Path syncFile;
