@@ -5,6 +5,7 @@ import art.aelaort.models.servers.ssh.SshConfigServer;
 import org.apache.sshd.client.config.hosts.HostConfigEntry;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -22,7 +23,7 @@ public class SshConfigServerMapper {
 						key = e.getIdentities().iterator().next();
 					}
 					return new SshConfigServer(
-							getNameByHost(e.getHost(), serverNamesByHost),
+							getNameByConfigEntry(e, serverNamesByHost),
 							e.getHostName(),
 							key
 									.replace(sshCommonConfigKeyFilePrefix, "")
@@ -33,9 +34,13 @@ public class SshConfigServerMapper {
 				.toList();
 	}
 
-	private String getNameByHost(String host, Map<String, String> serverNamesByHost) {
-		String string = serverNamesByHost.get(host);
+	private String getNameByConfigEntry(HostConfigEntry e, Map<String, String> serverNamesByHost) {
+		String string = serverNamesByHost.get(e.getHost());
 		if (string == null) {
+			if (StringUtils.hasText(e.getProxyJump())) {
+				return e.getHost();
+			}
+
 			throw new SshNameNotFoundException();
 		}
 		return string;
