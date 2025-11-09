@@ -22,6 +22,7 @@ public class ExternalUtilities {
 	private Path invDataDir;
 
 	public void commitInvData() {
+		systemProcess.callProcess(invDataDir, "git add --all");
 		systemProcess.callProcess(invDataDir, "git commit -am \"wip\"");
 	}
 
