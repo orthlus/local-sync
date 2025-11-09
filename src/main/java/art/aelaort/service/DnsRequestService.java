@@ -35,11 +35,6 @@ public class DnsRequestService {
 		ZoneTransferIn xfr = buildLocalDnsRequest();
 		xfr.run();
 		List<Record> records = xfr.getAXFR();
-		for (Record record : records) {
-			if (record.getType() == Type.A) {
-				System.out.println(record);
-			}
-		}
 		return records.stream()
 				.filter(record -> record.getType() == Type.A)
 				.filter(record -> !record.getName().toString().startsWith("*"))

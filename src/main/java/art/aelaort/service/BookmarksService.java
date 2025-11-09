@@ -85,7 +85,7 @@ public class BookmarksService {
 		}
 
 		for (String dnsRecord : dnsRequestService.requestDomains()) {
-			csvLocal.add("%s,%s".formatted(dnsRecord, dnsRecord));
+			csvLocal.add("%s,http://%s".formatted(dnsRecord, dnsRecord));
 		}
 
 		csvLocal.sort(String.CASE_INSENSITIVE_ORDER);
