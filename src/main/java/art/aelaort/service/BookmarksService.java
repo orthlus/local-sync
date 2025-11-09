@@ -1,8 +1,6 @@
 package art.aelaort.service;
 
 import art.aelaort.models.servers.display.K8sIngressRouteRow;
-import art.aelaort.models.servers.k8s.K8sCluster;
-import art.aelaort.service.output.mapper.K8sRowMapper;
 import art.aelaort.service.s3.ServersManagementS3;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,7 +22,6 @@ import static art.aelaort.utils.Utils.log;
 @RequiredArgsConstructor
 public class BookmarksService {
 	private final ServersManagementS3 serversManagementS3;
-	private final K8sRowMapper k8sRowMapper;
 
 	@Value("${bookmarks.add-file}")
 	private String bookmarksAddFile;
@@ -45,8 +42,7 @@ public class BookmarksService {
 		bookmarksClustersLocalSet = new HashSet<>(Arrays.asList(bookmarksClustersLocal));
 	}
 
-	public void saveBookmarks(List<K8sCluster> clusters) {
-		List<K8sIngressRouteRow> k8sIngressRouteRows = k8sRowMapper.mapToIngressRouteRows(clusters);
+	public void saveBookmarks(List<K8sIngressRouteRow> k8sIngressRouteRows) {
 		Set<String> addBookmarksCsv = readAddBookmarksCsv();
 		List<String> csvLocal = new ArrayList<>();
 		List<String> csvCloud = new ArrayList<>();

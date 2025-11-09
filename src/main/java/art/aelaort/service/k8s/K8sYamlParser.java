@@ -1,7 +1,6 @@
 package art.aelaort.service.k8s;
 
 import art.aelaort.models.servers.k8s.K8sApp;
-import art.aelaort.models.servers.k8s.K8sHelmChart;
 import art.aelaort.models.servers.k8s.K8sIngressRoute;
 import art.aelaort.models.servers.k8s.K8sService;
 import art.aelaort.utils.Utils;
@@ -27,15 +26,6 @@ import java.util.Map;
 public class K8sYamlParser {
 	private final Utils utils;
 	private final IngressRouteParser ingressRouteParser;
-	private final HelmChartParser helmChartParser;
-
-	public List<K8sIngressRoute> parseK8sYmlFileForIngressRoutes(List<HasMetadata> hasMetadataList) {
-		return ingressRouteParser.getIngressRoutes(hasMetadataList);
-	}
-
-	public List<K8sHelmChart> parseK8sYmlFileForHelmCharts(List<HasMetadata> hasMetadataList) {
-		return helmChartParser.getChartsList(hasMetadataList);
-	}
 
 	public List<K8sService> parseK8sYmlFileForServices(List<HasMetadata> hasMetadataList) {
 		List<K8sService> result = new ArrayList<>(hasMetadataList.size());

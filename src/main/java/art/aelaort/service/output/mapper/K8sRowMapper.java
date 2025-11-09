@@ -16,16 +16,16 @@ import static org.springframework.util.StringUtils.hasText;
 
 @Component
 public class K8sRowMapper {
-	public List<K8sIngressRouteRow> mapToIngressRouteRows(List<K8sCluster> clusters) {
+	public List<K8sIngressRouteRow> mapToIngressRouteRows(Map<String, List<K8sIngressRoute>> clustersIngressRoutes) {
 		List<K8sIngressRouteRow> res = new ArrayList<>();
-		for (K8sCluster cluster : clusters) {
-			List<K8sIngressRoute> distinctRoutes = cluster.ingressRoutes()
+		for (Map.Entry<String, List<K8sIngressRoute>> entry : clustersIngressRoutes.entrySet()) {
+			List<K8sIngressRoute> distinctRoutes = entry.getValue()
 					.stream()
 					.distinct()
 					.toList();
 			for (K8sIngressRoute ingressRoute : distinctRoutes) {
 				K8sIngressRouteRow k8sIngressRouteRow = new K8sIngressRouteRow(
-						cluster.name(),
+						entry.getKey(),
 						ingressRoute.getNamespace(),
 						ingressRoute.getName(),
 						(ingressRoute.isHasTls() ? "https://" : "http://") + Utils.cleanK8sRouteMatchIfPossible(ingressRoute.getMatch())
