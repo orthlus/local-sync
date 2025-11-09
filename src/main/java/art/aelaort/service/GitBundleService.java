@@ -69,7 +69,7 @@ public class GitBundleService {
 		List<Path> gitRepos = getGitRepos();
 		Set<String> currentBundles = getCurrentBundles();
 		gitRepos = filterGitRepos(gitRepos, currentBundles);
-		makeBundles(gitRepos, bundlesDir, false, false);
+		makeBundles(gitRepos, bundlesDir, false, true);
 		saveTimestamp();
 		log(wrapGreen("git bundles created"));
 	}
