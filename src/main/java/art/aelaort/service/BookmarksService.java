@@ -24,6 +24,7 @@ import static art.aelaort.utils.Utils.log;
 @RequiredArgsConstructor
 public class BookmarksService {
 	private final ServersManagementS3 serversManagementS3;
+	private final DnsRequestService dnsRequestService;
 
 	@Value("${bookmarks.add-file}")
 	private String bookmarksAddFile;
@@ -81,6 +82,10 @@ public class BookmarksService {
 			} else {
 				log(wrapRed("bookmarks (add) - неизвестный кластер " + cluster));
 			}
+		}
+
+		for (String dnsRecord : dnsRequestService.requestDomains()) {
+			csvLocal.add("%s,%s".formatted(dnsRecord, dnsRecord));
 		}
 
 		csvLocal.sort(String.CASE_INSENSITIVE_ORDER);

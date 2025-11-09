@@ -95,6 +95,12 @@
             <version>2.15.1</version>
         </dependency>
 
+        <dependency>
+            <groupId>dnsjava</groupId>
+            <artifactId>dnsjava</artifactId>
+            <version>3.6.3</version>
+        </dependency>
+
     </dependencies>
 
     <build>
