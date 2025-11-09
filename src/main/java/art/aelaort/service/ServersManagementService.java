@@ -40,10 +40,10 @@ public class ServersManagementService {
 
 	public void saveData(List<Server> servers, List<K8sCluster> clusters) {
 		String json = toJson(servers);
-		saveJsonToLocal(json);
+		saveTextFileToLocal(jsonDataPath, json);
 
 		String jsonK8s = toJsonK8s(clusters);
-		saveK8sJsonToLocal(jsonK8s);
+		saveTextFileToLocal(k8sProps.getSyncFile(), jsonK8s);
 
 		log("saved data to local");
 
@@ -58,17 +58,12 @@ public class ServersManagementService {
 	}
 
 	@SneakyThrows
-	private void saveJsonToLocal(String jsonStr) {
-		Files.writeString(jsonDataPath, jsonStr);
+	private void saveTextFileToLocal(Path file, String jsonStr) {
+		Files.writeString(file, jsonStr);
 	}
 
 	@SneakyThrows
 	private String toJsonK8s(List<K8sCluster> clusters) {
 		return prettyObjectMapper.writeValueAsString(clusters);
-	}
-
-	@SneakyThrows
-	private void saveK8sJsonToLocal(String jsonStr) {
-		Files.writeString(k8sProps.getSyncFile(), jsonStr);
 	}
 }

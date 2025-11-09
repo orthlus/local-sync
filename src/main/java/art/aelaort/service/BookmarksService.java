@@ -3,12 +3,14 @@ package art.aelaort.service;
 import art.aelaort.models.servers.display.K8sIngressRouteRow;
 import art.aelaort.service.s3.ServersManagementS3;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -31,9 +33,14 @@ public class BookmarksService {
 	private String bookmarksS3KeyLocal;
 	@Value("${bookmarks.clusters.cloud}")
 	private String[] bookmarksClustersCloud;
-	private Set<String> bookmarksClustersCloudSet;
 	@Value("${bookmarks.clusters.local}")
 	private String[] bookmarksClustersLocal;
+	@Value("${bookmarks.local-sync.file.local}")
+	private Path bookmarksLocalSyncFileLocal;
+	@Value("${bookmarks.local-sync.file.cloud}")
+	private Path bookmarksLocalSyncFileCloud;
+
+	private Set<String> bookmarksClustersCloudSet;
 	private Set<String> bookmarksClustersLocalSet;
 
 	@PostConstruct
@@ -94,9 +101,16 @@ public class BookmarksService {
 		String header = "id,name,route\n";
 		String resultCsvLocal = header + String.join("\n", csvLocal);
 		serversManagementS3.uploadBookmarks(bookmarksS3KeyLocal, resultCsvLocal);
+		saveTextFileToLocal(bookmarksLocalSyncFileLocal, resultCsvLocal);
 
 		String resultCsvCloud = header + String.join("\n", csvCloud);
 		serversManagementS3.uploadBookmarks(bookmarksS3KeyCloud, resultCsvCloud);
+		saveTextFileToLocal(bookmarksLocalSyncFileCloud, resultCsvLocal);
+	}
+
+	@SneakyThrows
+	private void saveTextFileToLocal(Path file, String jsonStr) {
+		Files.writeString(file, jsonStr);
 	}
 
 	private Set<String> readAddBookmarksCsv() {
