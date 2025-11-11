@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -34,17 +35,34 @@ public class DirServerProvider {
 	@Value("${servers.management.files.not_scan}")
 	private String notScanFile;
 	private Map<String, Integer> pricesMap;
+	@Value("${servers.management.files.monitoring}")
+	private String monitoringFile;
 
 	@PostConstruct
 	private void init() {
 		fillPrices();
 	}
 
+	@SuppressWarnings("OptionalIsPresent")
 	public List<DirServer> scanServersDir() {
-		return scanLocalDirs()
-				.stream()
-				.map(this::findYmlFile).filter(Optional::isPresent).map(Optional::get)
-				.map(this::parseYmlFile).filter(Optional::isPresent).map(Optional::get)
+		List<DirServer> result = new ArrayList<>();
+		for (Path serverDir : scanLocalDirs()) {
+			Optional<Path> ymlFile = findYmlFile(serverDir);
+			if (ymlFile.isPresent()) {
+				Optional<DirServer> dirServer = parseYmlFile(ymlFile.get());
+				if (dirServer.isPresent()) {
+					result.add(dirServer.get());
+				}
+			} else {
+				result.add(DirServer.builder()
+						.name(serverDir.getFileName().toString())
+						.monitoring(serverDir.resolve(monitoringFile).toFile().exists())
+						.services(List.of())
+						.build());
+			}
+		}
+
+		return result.stream()
 				.map(this::enrich)
 				.toList();
 	}
