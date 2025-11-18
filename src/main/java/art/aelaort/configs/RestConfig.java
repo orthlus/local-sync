@@ -11,10 +11,21 @@ class RestConfig {
 	@Value("${servers.ui.url}")
 	private String uiUrl;
 
+	@Value("${bookmarks.local.webdav.url}")
+	private String bookmarksLocalWebdavUrl;
+
 	@Bean
 	public RestTemplate serversUiRestTemplate(RestTemplateBuilder builder) {
 		return builder
 				.rootUri(uiUrl)
 				.build();
 	}
+
+	@Bean
+	public RestTemplate bookmarksWebdavRestTemplate(RestTemplateBuilder builder) {
+		return builder
+				.rootUri(bookmarksLocalWebdavUrl)
+				.build();
+	}
+
 }

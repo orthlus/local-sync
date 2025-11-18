@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
@@ -25,6 +26,7 @@ import static art.aelaort.utils.Utils.log;
 public class BookmarksService {
 	private final ServersManagementS3 serversManagementS3;
 	private final DnsRequestService dnsRequestService;
+	private final RestTemplate bookmarksWebdavRestTemplate;
 
 	@Value("${bookmarks.add-file}")
 	private String bookmarksAddFile;
@@ -107,15 +109,21 @@ public class BookmarksService {
 		String resultCsvLocal = header + String.join("\n", csvLocal);
 		serversManagementS3.uploadBookmarks(bookmarksS3KeyLocal, resultCsvLocal);
 		saveTextFileToLocal(bookmarksLocalSyncFileLocal, resultCsvLocal);
+		uploadTextFileToLocalInstance(bookmarksLocalSyncFileLocal, resultCsvLocal);
 
 		String resultCsvCloud = header + String.join("\n", csvCloud);
 		serversManagementS3.uploadBookmarks(bookmarksS3KeyCloud, resultCsvCloud);
 		saveTextFileToLocal(bookmarksLocalSyncFileCloud, resultCsvLocal);
+		uploadTextFileToLocalInstance(bookmarksLocalSyncFileCloud, resultCsvLocal);
+	}
+
+	private void uploadTextFileToLocalInstance(Path file, String text) {
+		bookmarksWebdavRestTemplate.put("/" + file.getFileName().toString(), text);
 	}
 
 	@SneakyThrows
-	private void saveTextFileToLocal(Path file, String jsonStr) {
-		Files.writeString(file, jsonStr);
+	private void saveTextFileToLocal(Path file, String text) {
+		Files.writeString(file, text);
 	}
 
 	private Set<String> readAddBookmarksCsv() {
