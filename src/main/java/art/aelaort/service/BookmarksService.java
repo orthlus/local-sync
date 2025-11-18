@@ -42,6 +42,10 @@ public class BookmarksService {
 	private Path bookmarksLocalSyncFileLocal;
 	@Value("${bookmarks.local-sync.file.cloud}")
 	private Path bookmarksLocalSyncFileCloud;
+	@Value("${bookmarks.local.webdav.file.local}")
+	private String bookmarksLocalWebdavFileLocal;
+	@Value("${bookmarks.local.webdav.file.cloud}")
+	private String bookmarksLocalWebdavFileCloud;
 
 	private Set<String> bookmarksClustersCloudSet;
 	private Set<String> bookmarksClustersLocalSet;
@@ -109,16 +113,16 @@ public class BookmarksService {
 		String resultCsvLocal = header + String.join("\n", csvLocal);
 		serversManagementS3.uploadBookmarks(bookmarksS3KeyLocal, resultCsvLocal);
 		saveTextFileToLocal(bookmarksLocalSyncFileLocal, resultCsvLocal);
-		uploadTextFileToLocalInstance(bookmarksLocalSyncFileLocal, resultCsvLocal);
+		uploadTextFileToLocalInstance(bookmarksLocalWebdavFileLocal, resultCsvLocal);
 
 		String resultCsvCloud = header + String.join("\n", csvCloud);
 		serversManagementS3.uploadBookmarks(bookmarksS3KeyCloud, resultCsvCloud);
 		saveTextFileToLocal(bookmarksLocalSyncFileCloud, resultCsvLocal);
-		uploadTextFileToLocalInstance(bookmarksLocalSyncFileCloud, resultCsvLocal);
+		uploadTextFileToLocalInstance(bookmarksLocalWebdavFileCloud, resultCsvLocal);
 	}
 
-	private void uploadTextFileToLocalInstance(Path file, String text) {
-		bookmarksWebdavRestTemplate.put("/" + file.getFileName().toString(), text);
+	private void uploadTextFileToLocalInstance(String file, String text) {
+		bookmarksWebdavRestTemplate.put("/" + file, text);
 	}
 
 	@SneakyThrows
