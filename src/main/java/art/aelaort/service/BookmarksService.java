@@ -117,8 +117,8 @@ public class BookmarksService {
 
 		String resultCsvCloud = header + String.join("\n", csvCloud);
 		serversManagementS3.uploadBookmarks(bookmarksS3KeyCloud, resultCsvCloud);
-		saveTextFileToLocal(bookmarksLocalSyncFileCloud, resultCsvLocal);
-		uploadTextFileToLocalInstance(bookmarksLocalWebdavFileCloud, resultCsvLocal);
+		saveTextFileToLocal(bookmarksLocalSyncFileCloud, resultCsvCloud);
+		uploadTextFileToLocalInstance(bookmarksLocalWebdavFileCloud, resultCsvCloud);
 	}
 
 	private void uploadTextFileToLocalInstance(String file, String text) {
