@@ -2,13 +2,11 @@ package art.aelaort.service;
 
 import art.aelaort.exceptions.AppExitErrorException;
 import art.aelaort.exceptions.AppPrintUsageException;
-import art.aelaort.exceptions.SshNameNotFoundException;
 import art.aelaort.utils.ExternalUtilities;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-import static art.aelaort.utils.ColoredConsoleTextUtils.wrapRed;
 import static art.aelaort.utils.Utils.log;
 import static art.aelaort.utils.Utils.slice;
 
@@ -38,9 +36,6 @@ public class Entrypoint implements CommandLineRunner {
 				log(usage());
 				System.exit(1);
 			}
-		} catch (SshNameNotFoundException e) {
-			log(wrapRed("в ssh-config-names.properties не найден какой-то ssh сервер из конфига :("));
-			System.exit(1);
 		} catch (AppExitErrorException e) {
 			System.exit(1);
 		} catch (AppPrintUsageException e) {

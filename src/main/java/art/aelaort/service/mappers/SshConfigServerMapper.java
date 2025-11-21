@@ -1,6 +1,5 @@
 package art.aelaort.service.mappers;
 
-import art.aelaort.exceptions.SshNameNotFoundException;
 import art.aelaort.models.servers.ssh.SshConfigServer;
 import org.apache.sshd.client.config.hosts.HostConfigEntry;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,10 +41,9 @@ public class SshConfigServerMapper {
 		if (string == null) {
 			if (StringUtils.hasText(e.getProxyJump())) {
 				log(wrapRed("ssh конфиг - %s не имеет полного имени".formatted(e.getHost())));
-				return e.getHost();
 			}
 
-			throw new SshNameNotFoundException();
+			return e.getHost();
 		}
 		return string;
 	}
